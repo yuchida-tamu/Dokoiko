@@ -17,11 +17,36 @@ db.on("open", () => {
   console.log("DB connected!!!");
 });
 
+//MODELS=> REFACTOR LATER...
+const EventList = new mongoose.Schema();
+const PlaceList = new mongoose.Schema();
+const Event = new mongoose.Schema();
+const Place = new mongoose.Schema();
+
+const UserSchema = new mongoose.Schema({
+  username: { type: String },
+  first_name: { type: String },
+  last_name: { type: String },
+  password: { type: String },
+  visiting_events: { type: [EventList] },
+  visiting_places: { type: [PlaceList] },
+  favorite_events: { type: [Event] },
+  favorite_places: { type: [Place] },
+});
+
+mongoose.model("User", UserSchema);
+
 app.use(cors());
 /*
  * parses request body (json)
  */
 app.use(bodyParser.json());
+
+/*
+ * user api service
+ */
+const user = require("./api/user");
+app.use("/api/v1/user", user);
 
 app.get("/", (req, res) => {
   res.send("Hello World!!");
