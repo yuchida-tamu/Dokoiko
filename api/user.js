@@ -6,7 +6,7 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 
-const User = mongoose.model("User");
+const UserModel = mongoose.model("User");
 
 router.route("/").get((req, res) => {
   res.send("User API...");
@@ -25,20 +25,20 @@ router.route("/new").post(async (req, res) => {
   if (!password)
     res.status(300).json({ status: "FAIL", msg: "password is missing" });
 
-  if (await User.findOne({ username }).exec())
+  if (await UserModel.findOne({ username }).exec())
     return res.status(300).json({
       status: "FAIL",
       msg: "user with the same username already exists",
     });
 
-  if (await User.findOne({ email }).exec())
+  if (await UserModel.findOne({ email }).exec())
     return res.status(300).json({
       status: "FAIL",
       msg: "the email is already used",
     });
   /* Input validation END */
 
-  const newUser = new User({
+  const newUser = new UserModel({
     username,
     first_name,
     last_name,
@@ -61,6 +61,25 @@ router.route("/new").post(async (req, res) => {
     res
       .status(500)
       .json({ status: "FAIL", msg: "could not create a new user", error: err });
+  }
+});
+
+router.route("/:id").get(async (req, res) => {
+  const { id } = req.params;
+  /* validate input */
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(300).json({ status: "FAIL", msg: "invalid id format" });
+  }
+
+  try {
+    const fetchedUser = await UserModel.findById(id);
+    res
+      .status(200)
+      .json({ status: "SUCCESS", msg: "fetched the user", user: fetchedUser });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ status: "FAIL", msg: "could not fetch the user", error: err });
   }
 });
 
