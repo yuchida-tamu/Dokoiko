@@ -20,7 +20,12 @@ db.on("open", () => {
 //MODELS=> REFACTOR LATER...
 const EventList = new mongoose.Schema();
 const PlaceList = new mongoose.Schema();
-const Event = new mongoose.Schema();
+const Event = new mongoose.Schema({
+  list_id: { type: String },
+  name: { type: String },
+  description: { type: String },
+  date: { tyep: Date },
+});
 const Place = new mongoose.Schema();
 
 const UserSchema = new mongoose.Schema({
@@ -36,6 +41,7 @@ const UserSchema = new mongoose.Schema({
 });
 
 mongoose.model("User", UserSchema);
+mongoose.model("Event", Event);
 
 app.use(cors());
 /*
@@ -48,6 +54,11 @@ app.use(bodyParser.json());
  */
 const user = require("./api/user");
 app.use("/api/v1/user", user);
+/*
+ * event api service
+ */
+const event = require("./api/event");
+app.use("/api/v1/event", event);
 
 app.get("/", (req, res) => {
   res.send("Hello World!!");
