@@ -22,9 +22,11 @@ const EventList = new mongoose.Schema();
 const PlaceList = new mongoose.Schema();
 const Event = new mongoose.Schema({
   list_id: { type: String },
+  place_id: { type: String },
   name: { type: String },
   description: { type: String },
-  date: { tyep: Date },
+  dateStart: { type: Date },
+  dateEnd: { type: Date },
 });
 const Place = new mongoose.Schema();
 
