@@ -27,6 +27,7 @@ const Event = new mongoose.Schema({
   description: { type: String },
   dateStart: { type: Date },
   dateEnd: { type: Date },
+  photos: { type: [String] },
 });
 const Place = new mongoose.Schema();
 

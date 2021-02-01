@@ -23,7 +23,15 @@ router.route("/").get(async (req, res) => {
 });
 
 router.route("/new").post(async (req, res) => {
-  const { list_id, place_id, name, description, dateStart, dateEnd } = req.body;
+  const {
+    list_id,
+    place_id,
+    name,
+    description,
+    dateStart,
+    dateEnd,
+    photos,
+  } = req.body;
 
   const validation = validateInputs(req.body);
   if (validation.isValid) {
@@ -31,9 +39,10 @@ router.route("/new").post(async (req, res) => {
       list_id,
       place_id,
       name,
-      description: description === undefined ? "" : description,
-      dateStart: dateStart === undefined ? new Date.now() : dateStart,
-      dateEnd: dateEnd === undefined ? new Date.now() : dateEnd,
+      description,
+      dateStart,
+      dateEnd,
+      photos: photos ? photos : [],
     });
 
     try {
@@ -90,6 +99,7 @@ router
         description: req.body.description,
         dateStart: req.body.dateStart,
         dateEnd: req.body.dateEnd,
+        photos: req.body.photos,
       };
       const options = { new: true, useFindAndModify: false };
 
