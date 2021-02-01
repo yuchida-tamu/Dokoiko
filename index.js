@@ -20,7 +20,7 @@ db.on("open", () => {
 //MODELS=> REFACTOR LATER...
 const EventList = new mongoose.Schema();
 const PlaceList = new mongoose.Schema();
-const Event = new mongoose.Schema({
+const EventSchema = new mongoose.Schema({
   list_id: { type: String },
   place_id: { type: String },
   name: { type: String },
@@ -29,7 +29,18 @@ const Event = new mongoose.Schema({
   dateEnd: { type: Date },
   photos: { type: [String] },
 });
-const Place = new mongoose.Schema();
+const PlaceSchema = new mongoose.Schema({
+  place_id: { type: String },
+  name: { type: String },
+  events: { type: [EventSchema] },
+  address: { type: String },
+  location: {
+    lat: { type: String },
+    lng: { type: String },
+  },
+  photos: { type: String },
+  types: { type: [String] },
+});
 
 const UserSchema = new mongoose.Schema({
   username: { type: String },
@@ -39,12 +50,13 @@ const UserSchema = new mongoose.Schema({
   password: { type: String },
   visiting_events: { type: [EventList] },
   visiting_places: { type: [PlaceList] },
-  favorite_events: { type: [Event] },
-  favorite_places: { type: [Place] },
+  favorite_events: { type: [EventSchema] },
+  favorite_places: { type: [PlaceSchema] },
 });
 
 mongoose.model("User", UserSchema);
-mongoose.model("Event", Event);
+mongoose.model("Event", EventSchema);
+mongoose.model("Place", PlaceSchema);
 
 app.use(cors());
 /*
@@ -62,6 +74,11 @@ app.use("/api/v1/user", user);
  */
 const event = require("./api/event");
 app.use("/api/v1/event", event);
+/*
+ * place api service
+ */
+const place = require("./api/place");
+app.use("/api/v1/place", place);
 
 app.get("/", (req, res) => {
   res.send("Hello World!!");
