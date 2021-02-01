@@ -53,24 +53,87 @@ router.route("/new").post(async (req, res) => {
     .json({ status: "FAIL", msg: `invalid input: ${validation.type}` });
 });
 
-router.route("/:id").get(async (req, res) => {
-  const { id } = req.params;
-  if (!mongoose.Types.ObjectId.isValid(id))
-    return res.status(300).json({ status: "FAIL", msg: "invalid id format" });
+router
+  .route("/:id")
+  .get(async (req, res) => {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id))
+      return res.status(300).json({ status: "FAIL", msg: "invalid id format" });
 
-  try {
-    const place = await PlaceModel.findById({ id });
-    return res.status(200).json({
-      status: "SUCCESS",
-      msg: "fetched the place successfully",
-      place: place,
-    });
-  } catch (err) {
+    try {
+      const place = await PlaceModel.findById({ id });
+      return res.status(200).json({
+        status: "SUCCESS",
+        msg: "fetched the place successfully",
+        place: place,
+      });
+    } catch (err) {
+      return res
+        .status(500)
+        .json({ status: "FAIL", msg: "couldn't find the places", error: err });
+    }
+  })
+  .put(async (req, res) => {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id))
+      return res.status(300).json({ status: "FAIL", msg: "invalid id format" });
+
+    const validation = validateInputs(req.body);
+
+    if (validation.isValid) {
+      const updates = {
+        place_id: req.body.place_id,
+        name: req.body.name,
+        events: req.body.events,
+        address: req.body.address,
+        location: req.body.location,
+        photos: req.body.photos,
+        types: req.body.types,
+      };
+
+      const options = { new: true, useFindAndModify: false };
+
+      try {
+        const updated = await PlaceModel.findOneAndUpdate(
+          { _id: id },
+          updates,
+          options
+        ).exec();
+        return res.status(200).json({
+          status: "SUCCESS",
+          msg: "created a new place",
+          place: updated,
+        });
+      } catch (err) {
+        return res.status(500).json({
+          status: "FAIL",
+          msg: "couldn't update the place",
+          error: err,
+        });
+      }
+    }
+
     return res
-      .status(500)
-      .json({ status: "FAIL", msg: "couldn't find the places", error: err });
-  }
-});
+      .status(300)
+      .json({ status: "FAIL", msg: `invalid input: ${validation.type}` });
+  })
+  .delete(async (req, res) => {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(300).json({ status: "FAIL", msg: "invalid id form" });
+    }
+
+    try {
+      const deleted = await PlaceModel.findOneAndRemove({ _id: id }).exec();
+      res
+        .status(200)
+        .json({ status: "SUCCESS", msg: "deleted the place", place: deleted });
+    } catch (err) {
+      res
+        .status(500)
+        .json({ status: "FAIL", msg: "couldn't delete the place" });
+    }
+  });
 
 const validateInputs = ({
   place_id,
