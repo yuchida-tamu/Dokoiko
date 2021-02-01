@@ -38,7 +38,7 @@ const PlaceSchema = new mongoose.Schema({
     lat: { type: String },
     lng: { type: String },
   },
-  photos: { type: String },
+  photos: { type: [String] },
   types: { type: [String] },
 });
 
