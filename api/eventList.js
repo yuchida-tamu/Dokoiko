@@ -1,6 +1,6 @@
 /*
- * place api
- * /api/v1/place
+ * eventlist api
+ * /api/v1/eventlist
  */
 const express = require("express");
 const router = express.Router();

@@ -19,8 +19,6 @@ db.on("open", () => {
 
 //MODELS=> REFACTOR LATER...
 
-const PlaceList = new mongoose.Schema();
-
 const EventSchema = new mongoose.Schema({
   list_id: { type: String },
   place_id: { type: String },
@@ -50,6 +48,13 @@ const EventListSchema = new mongoose.Schema({
   date: { type: Date },
 });
 
+const PlaceListSchema = new mongoose.Schema({
+  user_id: { type: String },
+  name: { type: String },
+  places: { type: [String] },
+  date: { type: Date },
+});
+
 const UserSchema = new mongoose.Schema({
   username: { type: String },
   first_name: { type: String },
@@ -57,7 +62,7 @@ const UserSchema = new mongoose.Schema({
   email: { type: String },
   password: { type: String },
   visiting_events: { type: [EventListSchema] },
-  visiting_places: { type: [PlaceList] },
+  visiting_places: { type: [PlaceListSchema] },
   favorite_events: { type: [EventSchema] },
   favorite_places: { type: [PlaceSchema] },
 });
@@ -66,6 +71,7 @@ mongoose.model("User", UserSchema);
 mongoose.model("Event", EventSchema);
 mongoose.model("Place", PlaceSchema);
 mongoose.model("EventList", EventListSchema);
+mongoose.model("PlaceList", PlaceListSchema);
 
 app.use(cors());
 /*
@@ -93,6 +99,11 @@ app.use("/api/v1/place", place);
  */
 const eventList = require("./api/eventList");
 app.use("/api/v1/eventlist", eventList);
+/*
+ * placelist api service
+ */
+const placeList = require("./api/placeList");
+app.use("/api/v1/placelist", placeList);
 
 app.get("/", (req, res) => {
   res.send("Hello World!!");
