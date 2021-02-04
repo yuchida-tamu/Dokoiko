@@ -132,6 +132,24 @@ router
     }
   });
 
+router.route("/user/:id").get(async (req, res) => {
+  const { id } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(id))
+    return res.status(400).json({ status: "FAIL", msg: "invalid id format" });
+  try {
+    const eventlists = await EventListModel.find({ user_id: id });
+    res.status(200).json({
+      status: "SUCCESS",
+      msg: "fetched eventlists of the user",
+      lists: eventlists,
+    });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ status: "FAIL", msg: "failed to fetch a list", error: err });
+  }
+});
+
 const validateInputs = ({ user_id, name, events, date }) => {
   if (!user_id) return { isValid: false, type: inputTypes.USER_ID };
   if (!name) return { isValid: false, type: inputTypes.NAME };
