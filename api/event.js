@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const inputTypes = require("./inputTypes/event");
+const DateTime = require("luxon").DateTime;
 const router = express.Router();
 
 const EventModel = mongoose.model("Event");
@@ -142,6 +143,62 @@ router
     }
   });
 
+router.route("/place/:placeId").get(async (req, res) => {
+  const { placeId } = req.params;
+  try {
+    const events = await EventModel.find({ place_id: placeId });
+    return res.status(200).json({
+      status: "SUCCESS",
+      msg: "fetched events at the place",
+      events: events,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      status: "FAIL",
+      msg: "failed to fetch events",
+      error: err,
+    });
+  }
+});
+
+router.route("/date/start").get(async (req, res) => {
+  const { dateStart } = req.body;
+
+  try {
+    const events = await EventModel.find({ dateStart: dateStart });
+    return res.status(200).json({
+      status: "SUCCESS",
+      msg: "fetched events on the date",
+      events: events,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      status: "FAIL",
+      msg: "failed to fetch events",
+      error: err,
+    });
+  }
+});
+
+router.route("/date/end").get(async (req, res) => {
+  const { dateEnd } = req.body;
+
+  try {
+    const events = await EventModel.find({ dateEnd: dateEnd });
+    return res.status(200).json({
+      status: "SUCCESS",
+      msg: "fetched events on the date",
+      events: events,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      status: "FAIL",
+      msg: "failed to fetch events",
+      error: err,
+    });
+  }
+});
+
 const validateInputs = ({
   list_id,
   place_id,
@@ -155,9 +212,15 @@ const validateInputs = ({
   if (!name || name.length === 0)
     return { isValid: false, type: inputTypes.NAME };
   if (!description) return { isValid: false, type: inputTypes.DESCRIPTION };
-  if (!dateStart) return { isValid: false, type: inputTypes.DATE_START };
-  if (!dateEnd) return { isValid: false, type: inputTypes.DATE_END };
+  if (!dateStart)
+    return { isValid: false, type: inputTypes.DATE_START_MISSING };
+  if (!dateEnd) return { isValid: false, type: inputTypes.DATE_END_MISSING };
 
+  const dStart = DateTime.fromISO(dateStart);
+  const dEnd = DateTime.fromISO(dateEnd);
+  if (!dStart.isValid) return { isValid: false, type: inputTypes.DATE_START };
+  if (!dEnd.isValid) return { isValid: false, type: inputTypes.DATE_END };
+  if (dEnd < dStart) return { isValid: false, type: inputTypes.DATE_ORDER };
   return { isValid: true, type: null };
 };
 
