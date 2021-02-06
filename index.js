@@ -22,7 +22,7 @@ db.on("open", () => {
 const EventSchema = new mongoose.Schema({
   list_id: { type: String },
   place_id: { type: String },
-  name: { type: String },
+  name: { type: String, required: true },
   description: { type: String },
   dateStart: { type: Date },
   dateEnd: { type: Date },
@@ -30,41 +30,49 @@ const EventSchema = new mongoose.Schema({
 });
 const PlaceSchema = new mongoose.Schema({
   place_id: { type: String },
-  name: { type: String },
+  name: { type: String, required: true },
   events: { type: [String] },
-  address: { type: String },
+  address: { type: String, required: true },
   location: {
-    lat: { type: String },
-    lng: { type: String },
+    lat: { type: String, required: true },
+    lng: { type: String, required: true },
   },
   photos: { type: [String] },
   types: { type: [String] },
 });
 
 const EventListSchema = new mongoose.Schema({
-  user_id: { type: String },
+  user_id: { type: String, required: true },
   name: { type: String },
   events: { type: [String] },
   date: { type: Date },
 });
 
 const PlaceListSchema = new mongoose.Schema({
-  user_id: { type: String },
+  user_id: { type: String, required: true },
   name: { type: String },
   places: { type: [String] },
   date: { type: Date },
 });
 
 const UserSchema = new mongoose.Schema({
-  username: { type: String },
-  first_name: { type: String },
-  last_name: { type: String },
-  email: { type: String },
-  password: { type: String },
+  username: { type: String, required: true },
+  first_name: { type: String, required: true },
+  last_name: { type: String, required: true },
+  email: { type: String, required: true },
+  password: { type: String, required: true },
   visiting_events: { type: [EventListSchema] },
   visiting_places: { type: [PlaceListSchema] },
   favorite_events: { type: [EventSchema] },
   favorite_places: { type: [PlaceSchema] },
+});
+
+const CommentSchema = new mongoose.Schema({
+  user_id: { type: String, required: true },
+  target_id: { type: String },
+  content: { type: String, required: true },
+  date: { type: Date, required: true },
+  likes: { type: Number },
 });
 
 mongoose.model("User", UserSchema);
@@ -72,6 +80,7 @@ mongoose.model("Event", EventSchema);
 mongoose.model("Place", PlaceSchema);
 mongoose.model("EventList", EventListSchema);
 mongoose.model("PlaceList", PlaceListSchema);
+mongoose.model("Comment", CommentSchema);
 
 app.use(cors());
 /*
@@ -104,11 +113,18 @@ app.use("/api/v1/eventlist", eventList);
  */
 const placeList = require("./api/placeList");
 app.use("/api/v1/placelist", placeList);
+/*
+ * comment api service
+ */
+const comment = require("./api/comment");
+app.use("/api/v1/comment", comment);
 
 app.get("/", (req, res) => {
   res.send("Hello World!!");
 });
 
-app.listen(process.env.PORT || 3000, () => {
-  console.log("server is running...");
+const port = process.env.PORT || 3000;
+
+app.listen(port, () => {
+  console.log("server is running on... " + port);
 });
