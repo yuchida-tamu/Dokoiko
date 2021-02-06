@@ -117,6 +117,42 @@ router
     }
   });
 
+router.route("/user/:id").get(async (req, res) => {
+  const { id } = req.params;
+  if (!mongoose.Types.ObjectId.isValid)
+    return res.status(300).json({ status: "FAIL", msg: "invalid id format" });
+  try {
+    const comments = await CommentModel.find({ user_id: id });
+    return res.status(200).json({
+      status: "SUCCESS",
+      msg: "fetched comments by user id",
+      comments,
+    });
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ status: "FAIL", msg: "failed to fetch comments by user id" });
+  }
+});
+
+router.route("/target/:id").get(async (req, res) => {
+  const { id } = req.params;
+  if (!mongoose.Types.ObjectId.isValid)
+    return res.status(300).json({ status: "FAIL", msg: "invalid id format" });
+  try {
+    const comments = await CommentModel.find({ target_id: id });
+    return res.status(200).json({
+      status: "SUCCESS",
+      msg: "fetched comments by target id",
+      comments,
+    });
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ status: "FAIL", msg: "failed to fetch comments by target id" });
+  }
+});
+
 const validateInputs = ({ user_id, target_id, content }) => {
   if (!user_id) return { isValid: false, type: inputTypes.USER_ID };
   if (!target_id) return { isValid: false, type: inputTypes.TARGET_ID };
