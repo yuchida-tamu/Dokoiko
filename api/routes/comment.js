@@ -1,6 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const inputTypes = require("./inputTypes/comment");
+const inputTypes = require("../inputTypes/comment");
 const DateTime = require("luxon").DateTime;
 const router = express.Router();
 

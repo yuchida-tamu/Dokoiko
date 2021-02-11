@@ -5,7 +5,7 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
-const inputTypes = require("./inputTypes/eventList");
+const inputTypes = require("../inputTypes/eventList");
 const DateTime = require("luxon").DateTime;
 
 const EventListModel = mongoose.model("EventList");
