@@ -12,7 +12,6 @@ const app = express();
  * Establish a connection to Database
  */
 require("./data/connectDB")();
-
 /*
  * MongoDB Data Models
  */
@@ -24,24 +23,20 @@ require("./data/models/placeList");
 require("./data/models/comment");
 
 /*
- * allow CORS
+ * Allow CORS
  */
 app.use(cors());
 /*
- * parses request body (json)
+ * Parses request body (json)
  */
 app.use(bodyParser.json());
-//configure cookie
-app.use(
-  cookieSession({
-    maxAge: 30 * 24 * 60 * 60 * 1000, //30days in milliseconds
-    keys: ["djahdavh12ui32hoijdhiahaaihida"], //Delete
-  })
-);
+/*
+ * Configure cookie
+ */
+require("./config/cookie")(app);
 //enable cookie
 app.use(passport.initialize());
 app.use(passport.session());
-
 /*
  * API Routes
  */
