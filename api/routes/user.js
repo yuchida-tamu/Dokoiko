@@ -5,15 +5,16 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
-
+const validator = require("../validators/userInputValidator");
 const UserModel = mongoose.model("User");
+const options = { new: true, useFindAndModify: false };
 
 router.route("/").get(async (req, res) => {
   try {
     const users = await UserModel.find();
     return res
       .status(200)
-      .json({ status: "SUCCESS", msg: "fetched users", user: users });
+      .json({ status: "SUCCESS", msg: "fetched users", users: users });
   } catch (err) {
     return res
       .status(500)
@@ -21,71 +22,59 @@ router.route("/").get(async (req, res) => {
   }
 });
 
-router.route("/new").post(async (req, res) => {
-  const { username, first_name, last_name, email, password } = req.body;
-  /* Input validation */
-  if (!username)
-    return res.status(300).json({ status: "FAIL", msg: "username is missing" });
-  if (!first_name)
-    return res
-      .status(300)
-      .json({ status: "FAIL", msg: "first_name is missing" });
-  if (!last_name)
-    return res
-      .status(300)
-      .json({ status: "FAIL", msg: "last_name is missing" });
-  if (!email)
-    return res.status(300).json({ status: "FAIL", msg: "email is missing" });
-  if (!password)
-    return res.status(300).json({ status: "FAIL", msg: "password is missing" });
+router
+  .route("/new")
+  .all(async (req, res, next) => {
+    const validation = await validator(req.body);
 
-  if (await UserModel.findOne({ username }).exec())
-    return res.status(300).json({
-      status: "FAIL",
-      msg: "user with the same username already exists",
+    if (!validation.isValid)
+      return res
+        .status(400)
+        .json({ status: "FAIL", msg: `invalid input :${validation.type}` });
+    next();
+  })
+  .post(async (req, res) => {
+    const { username, first_name, last_name, email, password } = req.body;
+
+    const newUser = new UserModel({
+      username,
+      first_name,
+      last_name,
+      email,
+      password,
+      visiting_events: [],
+      visiting_places: [],
+      favorite_events: [],
+      favorite_places: [],
     });
 
-  if (await UserModel.findOne({ email }).exec())
-    return res.status(300).json({
-      status: "FAIL",
-      msg: "the email is already used",
-    });
-  /* Input validation END */
-
-  const newUser = new UserModel({
-    username,
-    first_name,
-    last_name,
-    email,
-    password,
-    visiting_events: [],
-    visiting_places: [],
-    favorite_events: [],
-    favorite_places: [],
+    try {
+      const userSaved = await newUser.save();
+      return res.status(200).json({
+        status: "SUCCESS",
+        msg: "created a new user successfully",
+        user: userSaved,
+      });
+    } catch (err) {
+      return res.status(500).json({
+        status: "FAIL",
+        msg: "could not create a new user",
+        error: err,
+      });
+    }
   });
-
-  try {
-    const userSaved = await newUser.save();
-    return res.status(200).json({
-      status: "SUCCESS",
-      msg: "created a new user successfully",
-      user: userSaved,
-    });
-  } catch (err) {
-    return res
-      .status(500)
-      .json({ status: "FAIL", msg: "could not create a new user", error: err });
-  }
-});
 
 router
   .route("/:id")
-  .get(async (req, res) => {
+  .all(async (req, res, next) => {
     const { id } = req.params;
-    /* validate input */
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(300).json({ status: "FAIL", msg: "invalid id format" });
     }
+    next();
+  })
+  .get(async (req, res) => {
+    const { id } = req.params;
 
     try {
       const fetchedUser = await UserModel.findById(id);
@@ -101,63 +90,14 @@ router
     }
   })
   .put(async (req, res) => {
-    const { id } = req.params;
     const { username, first_name, last_name, email, password } = req.body;
-    /* Input validation */
-    if (!username)
-      return res
-        .status(300)
-        .json({ status: "FAIL", msg: "username is missing" });
-    if (!first_name)
-      return res
-        .status(300)
-        .json({ status: "FAIL", msg: "first_name is missing" });
-    if (!last_name)
-      return res
-        .status(300)
-        .json({ status: "FAIL", msg: "last_name is missing" });
-    if (!email)
-      return res.status(300).json({ status: "FAIL", msg: "email is missing" });
-    if (!password)
-      return res
-        .status(300)
-        .json({ status: "FAIL", msg: "password is missing" });
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(300).json({ status: "FAIL", msg: "invalid id format" });
-    }
+    const { id } = req.params;
+    const validation = await validator(req.body);
 
-    try {
-      const findUsername = await UserModel.findOne({
-        username: username,
-      }).exec();
-      /*Check if a new username is already used for other users */
-      const findEmail = await UserModel.findOne({ email: email }).exec();
-      if (findUsername) {
-        if (findUsername._id != id) {
-          return res.status(300).json({
-            status: "FAIL",
-            msg: "user with the same username already exists",
-          });
-        }
-      }
-      /*Check is a new email is already used for other users */
-      if (findEmail) {
-        console.log(id);
-        console.log(findEmail._id);
-        if (findEmail._id != id) {
-          return res.status(300).json({
-            status: "FAIL",
-            msg: "the email is already used",
-          });
-        }
-      }
-    } catch (err) {
+    if (!validation.isValid)
       return res
-        .status(500)
-        .json({ status: "FAIL", msg: "could not update the user", error: err });
-    }
-
-    const options = { new: true, useFindAndModify: false };
+        .status(400)
+        .json({ status: "FAIL", msg: `invalid input :${validation.type}` });
 
     try {
       const updates = {
@@ -180,6 +120,7 @@ router
         user: updatedUser,
       });
     } catch (err) {
+      console.log(err);
       return res
         .status(500)
         .json({ status: "FAIL", msg: "could not update the user", error: err });
@@ -187,12 +128,9 @@ router
   })
   .delete(async (req, res) => {
     const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(300).json({ status: "FAIL", msg: "invalid id format" });
-    }
 
     try {
-      const deleted = UserModel.findOneAndRemove({ _id: id }).exec();
+      const deleted = UserModel.findOneAndRemove({ _id: id }, options).exec();
       return res.status(200).json({
         status: "SUCCESS",
         msg: "deleted the user",

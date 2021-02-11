@@ -54,10 +54,22 @@ router.route("/new").post(async (req, res) => {
 
 router
   .route("/:id")
-  .get(async (req, res) => {
+  .all((req, res, next) => {
     const { id } = req.params;
+    const validation = validateInputs(req.body);
     if (!mongoose.Types.ObjectId.isValid)
       return res.status(300).json({ status: "FAIL", msg: "invalid id format" });
+    if (!validation.isValid) {
+      return res
+        .status(300)
+        .json({ status: "FAIL", msg: `invalid input: ${validation.type}` });
+    }
+    next();
+  })
+  .get(async (req, res) => {
+    const { id } = req.params;
+    // if (!mongoose.Types.ObjectId.isValid)
+    //   return res.status(300).json({ status: "FAIL", msg: "invalid id format" });
     try {
       const comment = await CommentModel.findOne({ _id: id });
       return res.status(200).json({
@@ -73,38 +85,38 @@ router
   })
   .put(async (req, res) => {
     const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid)
-      return res.status(300).json({ status: "FAIL", msg: "invalid id format" });
-    const validation = validateInputs(req.body);
-    if (validation.isValid) {
-      const updates = {
-        user_id: req.body.user_id,
-        target_id: req.body.target_id,
-        content: req.body.content,
-        date: DateTime.local(),
-      };
-      const options = { new: true, useFindAndModify: false };
-      const updated = await CommentModel.findOneAndUpdate(
-        {
-          _id: id,
-        },
-        updates,
-        options
-      ).exec();
-      return res.status(200).json({
-        status: "SUCCESS",
-        msg: "updated the comment successfully",
-        comment: updated,
-      });
-    }
-    return res
-      .status(300)
-      .json({ status: "FAIL", msg: `invalid input: ${validation.type}` });
+    // if (!mongoose.Types.ObjectId.isValid)
+    //   return res.status(300).json({ status: "FAIL", msg: "invalid id format" });
+    // const validation = validateInputs(req.body);
+    // if (validation.isValid) {
+    const updates = {
+      user_id: req.body.user_id,
+      target_id: req.body.target_id,
+      content: req.body.content,
+      date: DateTime.local(),
+    };
+    const options = { new: true, useFindAndModify: false };
+    const updated = await CommentModel.findOneAndUpdate(
+      {
+        _id: id,
+      },
+      updates,
+      options
+    ).exec();
+    return res.status(200).json({
+      status: "SUCCESS",
+      msg: "updated the comment successfully",
+      comment: updated,
+    });
+    //}
+    // return res
+    //   .status(300)
+    //   .json({ status: "FAIL", msg: `invalid input: ${validation.type}` });
   })
   .delete(async (req, res) => {
     const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid)
-      return res.status(300).json({ status: "FAIL", msg: "invalid id format" });
+    // if (!mongoose.Types.ObjectId.isValid)
+    //   return res.status(300).json({ status: "FAIL", msg: "invalid id format" });
     try {
       const deleted = await CommentModel.findOneAndRemove({ _id: id }).exec();
       return res.status(200).json({
@@ -117,41 +129,55 @@ router
     }
   });
 
-router.route("/user/:id").get(async (req, res) => {
-  const { id } = req.params;
-  if (!mongoose.Types.ObjectId.isValid)
-    return res.status(300).json({ status: "FAIL", msg: "invalid id format" });
-  try {
-    const comments = await CommentModel.find({ user_id: id });
-    return res.status(200).json({
-      status: "SUCCESS",
-      msg: "fetched comments by user id",
-      comments,
-    });
-  } catch (err) {
-    return res
-      .status(500)
-      .json({ status: "FAIL", msg: "failed to fetch comments by user id" });
-  }
-});
+router
+  .route("/user/:id")
+  .all((req, res, next) => {
+    if (!mongoose.Types.ObjectId.isValid)
+      return res.status(300).json({ status: "FAIL", msg: "invalid id format" });
+    next();
+  })
+  .get(async (req, res) => {
+    const { id } = req.params;
+    // if (!mongoose.Types.ObjectId.isValid)
+    //   return res.status(300).json({ status: "FAIL", msg: "invalid id format" });
+    try {
+      const comments = await CommentModel.find({ user_id: id });
+      return res.status(200).json({
+        status: "SUCCESS",
+        msg: "fetched comments by user id",
+        comments,
+      });
+    } catch (err) {
+      return res
+        .status(500)
+        .json({ status: "FAIL", msg: "failed to fetch comments by user id" });
+    }
+  });
 
-router.route("/target/:id").get(async (req, res) => {
-  const { id } = req.params;
-  if (!mongoose.Types.ObjectId.isValid)
-    return res.status(300).json({ status: "FAIL", msg: "invalid id format" });
-  try {
-    const comments = await CommentModel.find({ target_id: id });
-    return res.status(200).json({
-      status: "SUCCESS",
-      msg: "fetched comments by target id",
-      comments,
-    });
-  } catch (err) {
-    return res
-      .status(500)
-      .json({ status: "FAIL", msg: "failed to fetch comments by target id" });
-  }
-});
+router
+  .route("/target/:id")
+  .all((req, res, next) => {
+    if (!mongoose.Types.ObjectId.isValid)
+      return res.status(300).json({ status: "FAIL", msg: "invalid id format" });
+    next();
+  })
+  .get(async (req, res) => {
+    const { id } = req.params;
+    // if (!mongoose.Types.ObjectId.isValid)
+    //   return res.status(300).json({ status: "FAIL", msg: "invalid id format" });
+    try {
+      const comments = await CommentModel.find({ target_id: id });
+      return res.status(200).json({
+        status: "SUCCESS",
+        msg: "fetched comments by target id",
+        comments,
+      });
+    } catch (err) {
+      return res
+        .status(500)
+        .json({ status: "FAIL", msg: "failed to fetch comments by target id" });
+    }
+  });
 
 const validateInputs = ({ user_id, target_id, content }) => {
   if (!user_id) return { isValid: false, type: inputTypes.USER_ID };
