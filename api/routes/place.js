@@ -5,7 +5,7 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
-const inputTypes = require("./inputTypes/place");
+const inputTypes = require("../inputTypes/place");
 
 const PlaceModel = mongoose.model("Place");
 

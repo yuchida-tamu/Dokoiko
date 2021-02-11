@@ -5,56 +5,70 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
-const inputTypes = require("./inputTypes/placeList");
+const inputTypes = require("../inputTypes/placeList");
+const requireLogin = require("../middlewares/requireLogin");
 
 const PlaceListModel = mongoose.model("PlaceList");
 
-router.route("/").get(async (req, res) => {
-  try {
-    const lists = await PlaceListModel.find();
-    return res.status(200).json({
-      status: "SUCCESS",
-      msg: "fetched lists successfully",
-      lists: lists,
-    });
-  } catch (err) {
-    return res
-      .status(500)
-      .json({ status: "FAIL", msg: "failed to fetch lists", error: err });
-  }
-});
-
-router.route("/new").post(async (req, res) => {
-  const validation = validateInputs(req.body);
-  if (validation.isValid) {
+router
+  .route("/")
+  .all(requireLogin, (req, res, next) => {
+    next();
+  })
+  .get(async (req, res) => {
     try {
-      const newPlaceList = new PlaceListModel({
-        user_id: req.body.user_id,
-        name: req.body.name,
-        places: req.body.places,
-      });
-
-      const saved = await newPlaceList.save();
+      const lists = await PlaceListModel.find();
       return res.status(200).json({
         status: "SUCCESS",
-        msg: "created a new list",
-        list: saved,
+        msg: "fetched lists successfully",
+        lists: lists,
       });
     } catch (err) {
-      return res.status(500).json({
-        status: "FAIL",
-        msg: "failed to create a list",
-        error: err,
-      });
+      return res
+        .status(500)
+        .json({ status: "FAIL", msg: "failed to fetch lists", error: err });
     }
-  }
-  return res
-    .status(400)
-    .json({ status: "FAIL", msg: `invalid input: ${validation.type}` });
-});
+  });
+
+router
+  .route("/new")
+  .all(requireLogin, (req, res, next) => {
+    next();
+  })
+  .post(async (req, res) => {
+    const validation = validateInputs(req.body);
+    if (validation.isValid) {
+      try {
+        const newPlaceList = new PlaceListModel({
+          user_id: req.body.user_id,
+          name: req.body.name,
+          places: req.body.places,
+        });
+
+        const saved = await newPlaceList.save();
+        return res.status(200).json({
+          status: "SUCCESS",
+          msg: "created a new list",
+          list: saved,
+        });
+      } catch (err) {
+        return res.status(500).json({
+          status: "FAIL",
+          msg: "failed to create a list",
+          error: err,
+        });
+      }
+    }
+    return res
+      .status(400)
+      .json({ status: "FAIL", msg: `invalid input: ${validation.type}` });
+  });
 
 router
   .route("/:id")
+  .all(requireLogin, (req, res, next) => {
+    next();
+  })
   .get(async (req, res) => {
     const { id } = req.params;
     if (!mongoose.Types.ObjectId.isValid)
@@ -134,24 +148,29 @@ router
     }
   });
 
-router.route("/user/:id").get(async (req, res) => {
-  const { id } = req.params;
-  if (!mongoose.Types.ObjectId.isValid(id))
-    return res.status(400).json({ status: "FAIL", msg: "invalid id format" });
+router
+  .route("/user/:id")
+  .all(requireLogin, (req, res, next) => {
+    next();
+  })
+  .get(async (req, res) => {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id))
+      return res.status(400).json({ status: "FAIL", msg: "invalid id format" });
 
-  try {
-    const placelists = await PlaceListModel.find({ user_id: id });
-    return res.status(200).json({
-      status: "SUCCESS",
-      msg: "fetched placelists of the user",
-      lists: placelists,
-    });
-  } catch (err) {
-    return res
-      .status(500)
-      .json({ status: "FAIL", msg: "failed to fetch a list", error: err });
-  }
-});
+    try {
+      const placelists = await PlaceListModel.find({ user_id: id });
+      return res.status(200).json({
+        status: "SUCCESS",
+        msg: "fetched placelists of the user",
+        lists: placelists,
+      });
+    } catch (err) {
+      return res
+        .status(500)
+        .json({ status: "FAIL", msg: "failed to fetch a list", error: err });
+    }
+  });
 
 const validateInputs = ({ user_id, name, places }) => {
   if (!user_id) return { isValid: false, type: inputTypes.USER_ID };
