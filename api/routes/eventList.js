@@ -7,7 +7,7 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const inputTypes = require("../inputTypes/eventList");
 const DateTime = require("luxon").DateTime;
-const requireLogin = require("../middlewares/requireLogin");
+const requireLogin = require("../../middlewares/requireLogin");
 const EventListModel = mongoose.model("EventList");
 
 router

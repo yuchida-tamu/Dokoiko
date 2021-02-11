@@ -6,7 +6,7 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 const inputTypes = require("../inputTypes/placeList");
-const requireLogin = require("../middlewares/requireLogin");
+const requireLogin = require("../../middlewares/requireLogin");
 
 const PlaceListModel = mongoose.model("PlaceList");
 
