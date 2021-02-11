@@ -5,21 +5,27 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
+const requireLogin = require("../middlewares/requireLogin");
 
 const UserModel = mongoose.model("User");
 
-router.route("/").get(async (req, res) => {
-  try {
-    const users = await UserModel.find();
-    return res
-      .status(200)
-      .json({ status: "SUCCESS", msg: "fetched users", user: users });
-  } catch (err) {
-    return res
-      .status(500)
-      .json({ status: "FAIL", msg: "could not fetch users", error: err });
-  }
-});
+router
+  .route("/")
+  .all(requireLogin, (req, res, next) => {
+    next();
+  })
+  .get(async (req, res) => {
+    try {
+      const users = await UserModel.find();
+      return res
+        .status(200)
+        .json({ status: "SUCCESS", msg: "fetched users", user: users });
+    } catch (err) {
+      return res
+        .status(500)
+        .json({ status: "FAIL", msg: "could not fetch users", error: err });
+    }
+  });
 
 router.route("/new").post(async (req, res) => {
   const { username, first_name, last_name, email, password } = req.body;
@@ -72,14 +78,19 @@ router.route("/new").post(async (req, res) => {
       user: userSaved,
     });
   } catch (err) {
-    return res
-      .status(500)
-      .json({ status: "FAIL", msg: "could not create a new user", error: err });
+    return res.status(500).json({
+      status: "FAIL",
+      msg: "could not create a new user",
+      error: err,
+    });
   }
 });
 
 router
   .route("/:id")
+  .all(requireLogin, (req, res, next) => {
+    next();
+  })
   .get(async (req, res) => {
     const { id } = req.params;
     /* validate input */

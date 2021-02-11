@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const inputTypes = require("./inputTypes/comment");
 const DateTime = require("luxon").DateTime;
 const router = express.Router();
-
+const requireLogin = require("../middlewares/requireLogin");
 const CommentModel = mongoose.model("Comment");
 
 router.route("/").get(async (req, res) => {
@@ -23,34 +23,39 @@ router.route("/").get(async (req, res) => {
   }
 });
 
-router.route("/new").post(async (req, res) => {
-  const validation = validateInputs(req.body);
-  if (validation.isValid) {
-    const newComment = new CommentModel({
-      user_id: req.body.user_id,
-      target_id: req.body.target_id,
-      content: req.body.content,
-      date: DateTime.local(),
-    });
-    try {
-      const saved = await newComment.save();
-      return res.status(200).json({
-        status: "SUCCESS",
-        msg: "created a new comment successfully",
-        comment: saved,
+router
+  .route("/new")
+  .all(requireLogin, (req, res, next) => {
+    next();
+  })
+  .post(async (req, res) => {
+    const validation = validateInputs(req.body);
+    if (validation.isValid) {
+      const newComment = new CommentModel({
+        user_id: req.body.user_id,
+        target_id: req.body.target_id,
+        content: req.body.content,
+        date: DateTime.local(),
       });
-    } catch (err) {
-      return res.status(500).json({
-        status: "FAIL",
-        msg: "failed to create a comment",
-        error: err,
-      });
+      try {
+        const saved = await newComment.save();
+        return res.status(200).json({
+          status: "SUCCESS",
+          msg: "created a new comment successfully",
+          comment: saved,
+        });
+      } catch (err) {
+        return res.status(500).json({
+          status: "FAIL",
+          msg: "failed to create a comment",
+          error: err,
+        });
+      }
     }
-  }
-  return res
-    .status(300)
-    .json({ status: "FAIL", msg: `invalid input: ${validation.type}` });
-});
+    return res
+      .status(300)
+      .json({ status: "FAIL", msg: `invalid input: ${validation.type}` });
+  });
 
 router
   .route("/:id")

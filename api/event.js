@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const inputTypes = require("./inputTypes/event");
 const DateTime = require("luxon").DateTime;
 const router = express.Router();
-
+const requireLogin = require("../middlewares/requireLogin");
 const EventModel = mongoose.model("Event");
 
 router.route("/").get(async (req, res) => {
@@ -23,45 +23,50 @@ router.route("/").get(async (req, res) => {
   }
 });
 
-router.route("/new").post(async (req, res) => {
-  const {
-    list_id,
-    place_id,
-    name,
-    description,
-    dateStart,
-    dateEnd,
-    photos,
-  } = req.body;
-
-  const validation = validateInputs(req.body);
-  if (validation.isValid) {
-    const newEvent = new EventModel({
+router
+  .route("/new")
+  .all(requireLogin, (req, res, next) => {
+    next();
+  })
+  .post(async (req, res) => {
+    const {
       list_id,
       place_id,
       name,
       description,
       dateStart,
       dateEnd,
-      photos: photos ? photos : [],
-    });
+      photos,
+    } = req.body;
 
-    try {
-      const saved = await newEvent.save();
-      return res
-        .status(200)
-        .json({ status: "SUCCESS", msg: "an event saved!", event: saved });
-    } catch (err) {
-      return res
-        .status(500)
-        .json({ status: "FAIL", msg: "failed to save an event", error: err });
+    const validation = validateInputs(req.body);
+    if (validation.isValid) {
+      const newEvent = new EventModel({
+        list_id,
+        place_id,
+        name,
+        description,
+        dateStart,
+        dateEnd,
+        photos: photos ? photos : [],
+      });
+
+      try {
+        const saved = await newEvent.save();
+        return res
+          .status(200)
+          .json({ status: "SUCCESS", msg: "an event saved!", event: saved });
+      } catch (err) {
+        return res
+          .status(500)
+          .json({ status: "FAIL", msg: "failed to save an event", error: err });
+      }
     }
-  }
 
-  return res
-    .status(300)
-    .json({ status: "FAIL", msg: `invalid input: ${validation.type}` });
-});
+    return res
+      .status(300)
+      .json({ status: "FAIL", msg: `invalid input: ${validation.type}` });
+  });
 
 router
   .route("/:id")
