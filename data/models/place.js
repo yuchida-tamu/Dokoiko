@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const PlaceSchema = new mongoose.Schema({
   place_id: { type: String },
   name: { type: String },
-  events: { type: [EventSchema] },
+  events: { type: [String] },
   address: { type: String },
   location: {
     lat: { type: String },

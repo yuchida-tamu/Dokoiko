@@ -1,14 +1,14 @@
 /*
- * placelist api
- * /api/v1/placelist
+ * eventlist api
+ * /api/v1/eventlist
  */
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
+const inputTypes = require("../inputTypes/eventList");
+const DateTime = require("luxon").DateTime;
 const requireLogin = require("../middlewares/requireLogin");
-const inputTypes = require("./inputTypes/placeList");
-
-const PlaceListModel = mongoose.model("PlaceList");
+const EventListModel = mongoose.model("EventList");
 
 router
   .route("/")
@@ -17,16 +17,18 @@ router
   })
   .get(async (req, res) => {
     try {
-      const lists = await PlaceListModel.find();
-      return res.status(200).json({
+      const eventLists = await EventListModel.find({});
+      res.status(200).json({
         status: "SUCCESS",
-        msg: "fetched lists successfully",
-        lists: lists,
+        msg: "fetched all event lists",
+        lists: eventLists,
       });
     } catch (err) {
-      return res
-        .status(500)
-        .json({ status: "FAIL", msg: "failed to fetch lists", error: err });
+      res.status(500).json({
+        status: "FAIL",
+        msg: "failed to fetch event lists",
+        error: err,
+      });
     }
   });
 
@@ -38,23 +40,24 @@ router
   .post(async (req, res) => {
     const validation = validateInputs(req.body);
     if (validation.isValid) {
-      try {
-        const newPlaceList = new PlaceListModel({
-          user_id: req.body.user_id,
-          name: req.body.name,
-          places: req.body.places,
-        });
+      const newEventList = new EventListModel({
+        user_id: req.body.user_id,
+        name: req.body.name,
+        events: [...req.body.events],
+        date: req.body.date,
+      });
 
-        const saved = await newPlaceList.save();
+      try {
+        const saved = await newEventList.save();
         return res.status(200).json({
           status: "SUCCESS",
-          msg: "created a new list",
+          msg: "saved a new event list",
           list: saved,
         });
       } catch (err) {
         return res.status(500).json({
           status: "FAIL",
-          msg: "failed to create a list",
+          msg: "failed to save a new list",
           error: err,
         });
       }
@@ -71,80 +74,78 @@ router
   })
   .get(async (req, res) => {
     const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid)
-      return res.status(300).json({ status: "FAIL", msg: "invalid id format" });
+    if (!mongoose.Types.ObjectId.isValid(id))
+      return res.status(400).json({ status: "FAIL", msg: "invalid id format" });
 
     try {
-      const list = await PlaceListModel.findOne({ _id: id });
+      const list = await EventListModel.findById(id);
       return res.status(200).json({
         status: "SUCCESS",
-        msg: "fetched the list successfully",
+        msg: "fetched the eventlist successfully",
         list: list,
       });
     } catch (err) {
       return res.status(500).json({
         status: "FAIL",
-        msg: "failed to fetch the list",
+        msg: "failed to fetch the eventlist",
         error: err,
       });
     }
   })
   .put(async (req, res) => {
     const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid)
-      return res.status(300).json({ status: "FAIL", msg: "invalid id format" });
+    if (!mongoose.Types.ObjectId.isValid(id))
+      return res.status(400).json({ status: "FAIL", msg: "invalid id format" });
 
     const validation = validateInputs(req.body);
     if (validation.isValid) {
-      const options = { new: true, useFindAndModify: false };
-      try {
-        const updates = {
-          user_id: req.body.user_id,
-          name: req.body.name,
-          places: req.body.places,
-        };
+      const updates = {
+        user_id: req.body.user_id,
+        name: req.body.name,
+        events: [...req.body.events],
+        date: req.body.date,
+      };
 
-        const updated = await PlaceListModel.findOneAndUpdate(
+      const options = { new: true, useFindAndModify: false };
+
+      try {
+        const updated = await EventListModel.findOneAndUpdate(
           { _id: id },
           updates,
           options
         ).exec();
         return res.status(200).json({
           status: "SUCCESS",
-          msg: "updated the list",
+          msg: "updated a new event list",
           list: updated,
         });
       } catch (err) {
         return res.status(500).json({
           status: "FAIL",
-          msg: "failed to update a list",
+          msg: "failed to update a new list",
           error: err,
         });
       }
     }
-
-    return res
-      .status(400)
-      .json({ status: "FAIL", msg: `invalid input: ${validation.type}` });
   })
   .delete(async (req, res) => {
     const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid)
-      return res.status(300).json({ status: "FAIL", msg: "invalid id format" });
+    if (!mongoose.Types.ObjectId.isValid(id))
+      return res.status(400).json({ status: "FAIL", msg: "invalid id format" });
 
     try {
-      const deleted = await PlaceListModel.findByIdAndRemove({
-        _id: id,
-      }).exec();
-      return res.status(200).json({
+      const deleted = await EventListModel.findOneAndRemove({ _id: id }).exec();
+      res.status(200).json({
         status: "SUCCESS",
-        msg: "deleted the list successfully",
+        msg: "deleted the eventlist",
         list: deleted,
       });
     } catch (err) {
-      return res
-        .status(500)
-        .json({ status: "FAIL", msg: "failed to delete the list", error: err });
+      return res.status(500).json({
+        status: "FAIL",
+        msg: "failed to delete the list",
+        error: err,
+      });
     }
   });
 
@@ -157,26 +158,30 @@ router
     const { id } = req.params;
     if (!mongoose.Types.ObjectId.isValid(id))
       return res.status(400).json({ status: "FAIL", msg: "invalid id format" });
-
     try {
-      const placelists = await PlaceListModel.find({ user_id: id });
-      return res.status(200).json({
+      const eventlists = await EventListModel.find({ user_id: id });
+      res.status(200).json({
         status: "SUCCESS",
-        msg: "fetched placelists of the user",
-        lists: placelists,
+        msg: "fetched eventlists of the user",
+        lists: eventlists,
       });
     } catch (err) {
-      return res
+      res
         .status(500)
         .json({ status: "FAIL", msg: "failed to fetch a list", error: err });
     }
   });
 
-const validateInputs = ({ user_id, name, places }) => {
+const validateInputs = ({ user_id, name, events, date }) => {
   if (!user_id) return { isValid: false, type: inputTypes.USER_ID };
   if (!name) return { isValid: false, type: inputTypes.NAME };
-  if (!places) return { isValid: false, type: inputTypes.PLACES };
-
+  if (!events) return { isValid: false, type: inputTypes.EVENTS };
+  if (date) {
+    const d = DateTime.fromISO(date);
+    if (!d.isValid) return { isValid: false, type: inputTypes.DATE };
+  } else {
+    return { isValid: false, type: inputTypes.DATE };
+  }
   return { isValid: true, type: undefined };
 };
 
