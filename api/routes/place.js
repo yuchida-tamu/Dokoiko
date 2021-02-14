@@ -5,6 +5,7 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
+const validator = require("../validators/placeInputValidator");
 const inputTypes = require("../inputTypes/place");
 
 const PlaceModel = mongoose.model("Place");
@@ -23,7 +24,7 @@ router.route("/").get(async (req, res) => {
 });
 
 router.route("/new").post(async (req, res) => {
-  const validation = validateInputs(req.body);
+  const validation = validator(req.body);
   if (validation.isValid) {
     const newPlace = new PlaceModel({
       place_id: req.body.place_id,
@@ -55,10 +56,14 @@ router.route("/new").post(async (req, res) => {
 
 router
   .route("/:id")
-  .get(async (req, res) => {
+  .all((req, res, next) => {
     const { id } = req.params;
     if (!mongoose.Types.ObjectId.isValid(id))
       return res.status(300).json({ status: "FAIL", msg: "invalid id format" });
+    next();
+  })
+  .get(async (req, res) => {
+    const { id } = req.params;
 
     try {
       const place = await PlaceModel.findById(id);
@@ -75,10 +80,8 @@ router
   })
   .put(async (req, res) => {
     const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id))
-      return res.status(300).json({ status: "FAIL", msg: "invalid id format" });
 
-    const validation = validateInputs(req.body);
+    const validation = validator(req.body);
 
     if (validation.isValid) {
       const updates = {
@@ -119,9 +122,6 @@ router
   })
   .delete(async (req, res) => {
     const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(300).json({ status: "FAIL", msg: "invalid id form" });
-    }
 
     try {
       const deleted = await PlaceModel.findOneAndRemove({ _id: id }).exec();
@@ -134,27 +134,5 @@ router
         .json({ status: "FAIL", msg: "couldn't delete the place" });
     }
   });
-
-const validateInputs = ({
-  place_id,
-  name,
-  events,
-  address,
-  location,
-  photos,
-  types,
-}) => {
-  if (!events) return { isValid: false, type: inputTypes.EVENTS };
-  if (!place_id) return { isValid: false, type: inputTypes.PLACE_ID };
-  if (!name || name.length === 0)
-    return { isValid: false, type: inputTypes.NAME };
-  if (!address) return { isValid: false, type: inputTypes.ADDRESS };
-  if (!location) return { isValid: false, type: inputTypes.LOCATION };
-  if (!location.lat) return { isValid: false, type: inputTypes.LAT };
-  if (!location.lng) return { isValid: false, type: inputTypes.LNG };
-  if (!photos) return { isValid: false, type: inputTypes.PHOTOS };
-  if (!types) return { isValid: false, type: inputTypes.TYPES };
-  return { isValid: true, type: null };
-};
 
 module.exports = router;

@@ -5,7 +5,7 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
-const inputTypes = require("../inputTypes/placeList");
+const validator = require("../validators/placeListInputValidator");
 const requireLogin = require("../../middlewares/requireLogin");
 
 const PlaceListModel = mongoose.model("PlaceList");
@@ -36,7 +36,7 @@ router
     next();
   })
   .post(async (req, res) => {
-    const validation = validateInputs(req.body);
+    const validation = validator(req.body);
     if (validation.isValid) {
       try {
         const newPlaceList = new PlaceListModel({
@@ -67,12 +67,14 @@ router
 router
   .route("/:id")
   .all(requireLogin, (req, res, next) => {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid)
+      return res.status(300).json({ status: "FAIL", msg: "invalid id format" });
+
     next();
   })
   .get(async (req, res) => {
     const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid)
-      return res.status(300).json({ status: "FAIL", msg: "invalid id format" });
 
     try {
       const list = await PlaceListModel.findOne({ _id: id });
@@ -91,10 +93,8 @@ router
   })
   .put(async (req, res) => {
     const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid)
-      return res.status(300).json({ status: "FAIL", msg: "invalid id format" });
 
-    const validation = validateInputs(req.body);
+    const validation = validator(req.body);
     if (validation.isValid) {
       const options = { new: true, useFindAndModify: false };
       try {
@@ -129,8 +129,6 @@ router
   })
   .delete(async (req, res) => {
     const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid)
-      return res.status(300).json({ status: "FAIL", msg: "invalid id format" });
 
     try {
       const deleted = await PlaceListModel.findByIdAndRemove({
@@ -151,12 +149,14 @@ router
 router
   .route("/user/:id")
   .all(requireLogin, (req, res, next) => {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id))
+      return res.status(400).json({ status: "FAIL", msg: "invalid id format" });
+
     next();
   })
   .get(async (req, res) => {
     const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id))
-      return res.status(400).json({ status: "FAIL", msg: "invalid id format" });
 
     try {
       const placelists = await PlaceListModel.find({ user_id: id });
@@ -171,13 +171,5 @@ router
         .json({ status: "FAIL", msg: "failed to fetch a list", error: err });
     }
   });
-
-const validateInputs = ({ user_id, name, places }) => {
-  if (!user_id) return { isValid: false, type: inputTypes.USER_ID };
-  if (!name) return { isValid: false, type: inputTypes.NAME };
-  if (!places) return { isValid: false, type: inputTypes.PLACES };
-
-  return { isValid: true, type: undefined };
-};
 
 module.exports = router;

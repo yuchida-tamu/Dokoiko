@@ -3,7 +3,7 @@ const request = require("supertest");
 const app = require("../app");
 const connectDB = require("../data/connectDB");
 const closeDB = require("../data/closeDB");
-const URL_BASE = "/api/v1/event";
+const URL_BASE = "/api/v1/event/";
 const server = request.agent(app);
 
 const TEST_USER = {
@@ -124,6 +124,19 @@ describe("Server Test Event", () => {
         .end(done);
     });
   });
+
+  describe("GET: /", () => {
+    it("should return an array of event objects by placeid", (done) => {
+      request(app)
+        .get(URL_BASE + "place/" + TEST_UPDATE.place_id)
+        .expect(200)
+        .expect((res) => {
+          expect(res.body).toHaveProperty("events");
+        })
+        .end(done);
+    });
+  });
+
   describe("DELETE: /:id", () => {
     it("login", loginUser()); //login before invoking the api
     it("should delete and return the deleted event document", (done) => {
