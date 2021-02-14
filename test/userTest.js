@@ -51,7 +51,7 @@ describe("Server Test User", () => {
     });
   });
   describe("GET: /:id", () => {
-    it("should create and return an user document", (done) => {
+    it("should return an user document", (done) => {
       request(app)
         .get("/api/v1/user/" + userId)
         .expect(200)

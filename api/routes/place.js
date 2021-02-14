@@ -61,7 +61,7 @@ router
       return res.status(300).json({ status: "FAIL", msg: "invalid id format" });
 
     try {
-      const place = await PlaceModel.findById({ id });
+      const place = await PlaceModel.findById(id);
       return res.status(200).json({
         status: "SUCCESS",
         msg: "fetched the place successfully",
