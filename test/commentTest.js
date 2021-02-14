@@ -116,6 +116,42 @@ describe("Server Test Comment", () => {
         .end(done);
     });
   });
+
+  //   describe("GET: /user/:id", () => {
+  //     it("login", loginUser()); //login before invoking the api
+  //     it("should return an comment document", (done) => {
+  //       server
+  //         .get(URL_BASE + "user/" + TEST_UPDATE.user_id)
+  //         .expect(200)
+  //         .expect((res) => {
+  //           expect(res.body).toHaveProperty("comment");
+  //           expect(res.body.comment.user_id).toBe(TEST_OBJECT.user_id);
+  //           expect(res.body.comment.target_id).toBe(TEST_OBJECT.target_id);
+  //           expect(res.body.comment.content).toBe(TEST_OBJECT.content);
+  //           expect(res.body.comment.likes).toBe(TEST_OBJECT.likes);
+  //           //expect(res.body.list.date).toBe(TEST_OBJECT.date);
+  //         })
+  //         .end(done);
+  //     });
+  //   });
+  //   describe("GET: /target/:id", () => {
+  //     it("login", loginUser()); //login before invoking the api
+  //     it("should return an comment document", (done) => {
+  //       server
+  //         .get(URL_BASE + "user/" + TEST_UPDATE.target_id)
+  //         .expect(200)
+  //         .expect((res) => {
+  //           expect(res.body).toHaveProperty("comment");
+  //           expect(res.body.comment.user_id).toBe(TEST_OBJECT.user_id);
+  //           expect(res.body.comment.target_id).toBe(TEST_OBJECT.target_id);
+  //           expect(res.body.comment.content).toBe(TEST_OBJECT.content);
+  //           expect(res.body.comment.likes).toBe(TEST_OBJECT.likes);
+  //           //expect(res.body.list.date).toBe(TEST_OBJECT.date);
+  //         })
+  //         .end(done);
+  //     });
+  //   });
+
   describe("DELETE: /:id", () => {
     it("login", loginUser()); //login before invoking the api
     it("should delete and return the deleted comment document", (done) => {
