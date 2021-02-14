@@ -5,6 +5,8 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
 const validator = require("../validators/userInputValidator");
 const requireLogin = require("../../middlewares/requireLogin");
 const UserModel = mongoose.model("User");
@@ -25,7 +27,7 @@ router.route("/").get(async (req, res) => {
 
 router
   .route("/new")
-  .all(requireLogin, async (req, res, next) => {
+  .all(async (req, res, next) => {
     const validation = await validator(req.body);
 
     if (!validation.isValid)
@@ -34,35 +36,66 @@ router
         .json({ status: "FAIL", msg: `invalid input :${validation.type}` });
     next();
   })
-  .post(async (req, res) => {
+  .post((req, res) => {
     const { username, first_name, last_name, email, password } = req.body;
 
-    const newUser = new UserModel({
-      username,
-      first_name,
-      last_name,
-      email,
-      password,
-      visiting_events: [],
-      visiting_places: [],
-      favorite_events: [],
-      favorite_places: [],
-    });
+    bcrypt.hash(password, saltRounds, async (err, hash) => {
+      if (err)
+        return es.status(500).json({ status: "FAIL", msg: `internal error` });
 
-    try {
-      const userSaved = await newUser.save();
-      return res.status(200).json({
-        status: "SUCCESS",
-        msg: "created a new user successfully",
-        user: userSaved,
+      const newUser = new UserModel({
+        username,
+        first_name,
+        last_name,
+        email,
+        password: hash,
+        visiting_events: [],
+        visiting_places: [],
+        favorite_events: [],
+        favorite_places: [],
       });
-    } catch (err) {
-      return res.status(500).json({
-        status: "FAIL",
-        msg: "could not create a new user",
-        error: err,
-      });
-    }
+
+      try {
+        const userSaved = await newUser.save();
+        return res.status(200).json({
+          status: "SUCCESS",
+          msg: "created a new user successfully",
+          user: userSaved,
+        });
+      } catch (err) {
+        return res.status(500).json({
+          status: "FAIL",
+          msg: "could not create a new user",
+          error: err,
+        });
+      }
+    });
+    // const newUser = new UserModel({
+    //   username,
+    //   first_name,
+    //   last_name,
+    //   email,
+    //   password: hash,
+    //   visiting_events: [],
+    //   visiting_places: [],
+    //   favorite_events: [],
+    //   favorite_places: [],
+    // });
+
+    // try {
+    //   const userSaved = await newUser.save();
+    //   return res.status(200).json({
+    //     status: "SUCCESS",
+    //     msg: "created a new user successfully",
+    //     user: userSaved,
+    //   });
+    // } catch (err) {
+    //   return res.status(500).json({
+    //     status: "FAIL",
+    //     msg: "could not create a new user",
+    //     error: err,
+    //   });
+    // }
   });
 
 router
