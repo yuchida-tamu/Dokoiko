@@ -6,6 +6,7 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 const validator = require("../validators/userInputValidator");
+const requireLogin = require("../../middlewares/requireLogin");
 const UserModel = mongoose.model("User");
 const options = { new: true, useFindAndModify: false };
 
@@ -24,7 +25,7 @@ router.route("/").get(async (req, res) => {
 
 router
   .route("/new")
-  .all(async (req, res, next) => {
+  .all(requireLogin, async (req, res, next) => {
     const validation = await validator(req.body);
 
     if (!validation.isValid)
@@ -66,7 +67,7 @@ router
 
 router
   .route("/:id")
-  .all(async (req, res, next) => {
+  .all(requireLogin, async (req, res, next) => {
     const { id } = req.params;
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(300).json({ status: "FAIL", msg: "invalid id format" });

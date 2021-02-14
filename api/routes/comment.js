@@ -34,8 +34,6 @@ router
     next();
   })
   .post(async (req, res) => {
-    //const validation = validateInputs(req.body);
-
     const newComment = new CommentModel({
       user_id: req.body.user_id,
       target_id: req.body.target_id,
@@ -71,8 +69,6 @@ router
   })
   .get(async (req, res) => {
     const { id } = req.params;
-    // if (!mongoose.Types.ObjectId.isValid)
-    //   return res.status(300).json({ status: "FAIL", msg: "invalid id format" });
     try {
       const comment = await CommentModel.findOne({ _id: id });
       return res.status(200).json({
@@ -88,8 +84,6 @@ router
   })
   .put(async (req, res) => {
     const { id } = req.params;
-    // if (!mongoose.Types.ObjectId.isValid)
-    //   return res.status(300).json({ status: "FAIL", msg: "invalid id format" });
     const validation = validateInputs(req.body);
     if (validation.isValid) {
       const updates = {
@@ -119,8 +113,6 @@ router
   })
   .delete(async (req, res) => {
     const { id } = req.params;
-    // if (!mongoose.Types.ObjectId.isValid)
-    //   return res.status(300).json({ status: "FAIL", msg: "invalid id format" });
     try {
       const deleted = await CommentModel.findOneAndRemove({ _id: id }).exec();
       return res.status(200).json({
@@ -143,8 +135,6 @@ router
   })
   .get(async (req, res) => {
     const { id } = req.params;
-    // if (!mongoose.Types.ObjectId.isValid)
-    //   return res.status(300).json({ status: "FAIL", msg: "invalid id format" });
     try {
       const comments = await CommentModel.find({ user_id: id });
       return res.status(200).json({
@@ -169,8 +159,6 @@ router
   })
   .get(async (req, res) => {
     const { id } = req.params;
-    // if (!mongoose.Types.ObjectId.isValid)
-    //   return res.status(300).json({ status: "FAIL", msg: "invalid id format" });
     try {
       const comments = await CommentModel.find({ target_id: id });
       return res.status(200).json({
