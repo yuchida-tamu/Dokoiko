@@ -26,35 +26,37 @@ router.route("/").get(async (req, res) => {
 router
   .route("/new")
   .all(requireLogin, (req, res, next) => {
+    const validation = validateInputs(req.body);
+    if (!validation.isValid)
+      return res
+        .status(300)
+        .json({ status: "FAIL", msg: `invalid input: ${validation.type}` });
     next();
   })
   .post(async (req, res) => {
-    const validation = validateInputs(req.body);
-    if (validation.isValid) {
-      const newComment = new CommentModel({
-        user_id: req.body.user_id,
-        target_id: req.body.target_id,
-        content: req.body.content,
-        date: DateTime.local(),
+    //const validation = validateInputs(req.body);
+
+    const newComment = new CommentModel({
+      user_id: req.body.user_id,
+      target_id: req.body.target_id,
+      content: req.body.content,
+      likes: req.body.likes,
+      date: DateTime.local(),
+    });
+    try {
+      const saved = await newComment.save();
+      return res.status(200).json({
+        status: "SUCCESS",
+        msg: "created a new comment successfully",
+        comment: saved,
       });
-      try {
-        const saved = await newComment.save();
-        return res.status(200).json({
-          status: "SUCCESS",
-          msg: "created a new comment successfully",
-          comment: saved,
-        });
-      } catch (err) {
-        return res.status(500).json({
-          status: "FAIL",
-          msg: "failed to create a comment",
-          error: err,
-        });
-      }
+    } catch (err) {
+      return res.status(500).json({
+        status: "FAIL",
+        msg: "failed to create a comment",
+        error: err,
+      });
     }
-    return res
-      .status(300)
-      .json({ status: "FAIL", msg: `invalid input: ${validation.type}` });
   });
 
 router
@@ -62,13 +64,9 @@ router
   .all((req, res, next) => {
     const { id } = req.params;
     const validation = validateInputs(req.body);
-    if (!mongoose.Types.ObjectId.isValid)
+    if (!mongoose.Types.ObjectId.isValid(id))
       return res.status(300).json({ status: "FAIL", msg: "invalid id format" });
-    if (!validation.isValid) {
-      return res
-        .status(300)
-        .json({ status: "FAIL", msg: `invalid input: ${validation.type}` });
-    }
+
     next();
   })
   .get(async (req, res) => {
@@ -92,31 +90,32 @@ router
     const { id } = req.params;
     // if (!mongoose.Types.ObjectId.isValid)
     //   return res.status(300).json({ status: "FAIL", msg: "invalid id format" });
-    // const validation = validateInputs(req.body);
-    // if (validation.isValid) {
-    const updates = {
-      user_id: req.body.user_id,
-      target_id: req.body.target_id,
-      content: req.body.content,
-      date: DateTime.local(),
-    };
-    const options = { new: true, useFindAndModify: false };
-    const updated = await CommentModel.findOneAndUpdate(
-      {
-        _id: id,
-      },
-      updates,
-      options
-    ).exec();
-    return res.status(200).json({
-      status: "SUCCESS",
-      msg: "updated the comment successfully",
-      comment: updated,
-    });
-    //}
-    // return res
-    //   .status(300)
-    //   .json({ status: "FAIL", msg: `invalid input: ${validation.type}` });
+    const validation = validateInputs(req.body);
+    if (validation.isValid) {
+      const updates = {
+        user_id: req.body.user_id,
+        target_id: req.body.target_id,
+        content: req.body.content,
+        likes: req.body.likes,
+        date: DateTime.local(),
+      };
+      const options = { new: true, useFindAndModify: false };
+      const updated = await CommentModel.findOneAndUpdate(
+        {
+          _id: id,
+        },
+        updates,
+        options
+      ).exec();
+      return res.status(200).json({
+        status: "SUCCESS",
+        msg: "updated the comment successfully",
+        comment: updated,
+      });
+    }
+    return res
+      .status(300)
+      .json({ status: "FAIL", msg: `invalid input: ${validation.type}` });
   })
   .delete(async (req, res) => {
     const { id } = req.params;
@@ -137,7 +136,8 @@ router
 router
   .route("/user/:id")
   .all((req, res, next) => {
-    if (!mongoose.Types.ObjectId.isValid)
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id))
       return res.status(300).json({ status: "FAIL", msg: "invalid id format" });
     next();
   })
@@ -162,7 +162,8 @@ router
 router
   .route("/target/:id")
   .all((req, res, next) => {
-    if (!mongoose.Types.ObjectId.isValid)
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id))
       return res.status(300).json({ status: "FAIL", msg: "invalid id format" });
     next();
   })
