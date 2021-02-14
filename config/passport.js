@@ -2,6 +2,7 @@ const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const mongoose = require("mongoose");
 const UserModel = mongoose.model("User");
+const bcrypt = require("bcrypt");
 
 passport.serializeUser((user, done) => {
   done(null, user.id); //user.id refers to "Object ID(_id)" on a MongoDB item(Not googleId)
@@ -22,10 +23,15 @@ passport.use(
       if (!user) {
         return done(null, false, { message: "Incorrect username." });
       }
-      if (user.password !== password) {
-        return done(null, false, { message: "Incorrect password." });
-      }
-      return done(null, user);
+      bcrypt.compare(password, user.password, (err, result) => {
+        if (!result)
+          return done(null, false, { message: "Incorrect password." });
+        return done(null, user);
+      });
+      // if (user.password !== password) {
+      //   return done(null, false, { message: "Incorrect password." });
+      // }
+      // return done(null, user);
     });
   })
 );
