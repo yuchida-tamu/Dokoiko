@@ -13,13 +13,6 @@
   }
 }
 
-div.SideControl {
-  height: 100%;
-  padding: 0 !important;
-  margin: 0;
-  color: white;
-}
-
 .Header {
   height: 10vh;
   margin: 0;
@@ -29,44 +22,6 @@ div.SideControl {
   height: 90vh;
   padding: 0;
   margin: 0;
-}
-
-.MiniNav {
-  height: 100%;
-  margin: 0;
-  padding: 20px 0 0 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.MiniNav a {
-  margin-bottom: 10px;
-}
-
-.ItemContainer {
-  height: 100%;
-  margin: 0;
-  border: none;
-}
-
-.InfoPanel {
-  position: fixed;
-  transform: translate(0, -50%);
-  top: 50%;
-  right: 1% !important;
-  height: 60%;
-  padding: 0 !important;
-}
-
-.MapContainer {
-  height: 100%;
-  margin: 0;
-  border: none;
-}
-
-.icon-white {
-  color: white;
 }
 
 @keyframes App-logo-spin {
