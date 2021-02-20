@@ -67,6 +67,9 @@ div.SideControl {
 #event-detail__content {
   text-align: start;
   padding: 0 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 #event-detail_content__actions {
@@ -76,6 +79,6 @@ div.SideControl {
   color: #e64a19;
 }
 
-.EventCard {
+.event-card {
   cursor: pointer;
 }

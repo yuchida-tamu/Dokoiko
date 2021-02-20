@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./EventDashboard.css";
-
+import MiniNav from "../components/MiniNav/MiniNav";
 import photo from "../test.jpg";
 import { testEvent } from "../testData/events";
 
@@ -14,7 +14,7 @@ const EventDashboard = () => {
     return (
       <li
         key={event.id}
-        className="col s12 m7 l2 EventCard"
+        className="col s12 m7 l2 event-card"
         onClick={() => {
           eventClickHandler(event);
         }}
@@ -46,11 +46,18 @@ const EventDashboard = () => {
           <br />
         </div>
 
-        <div id="event-detail_content__actions">
-          <a>{eventSelected.id}</a>
-          <br />
-          <a class="btn-floating btn-medium waves-effect waves-light red">
-            <i class="material-icons">add</i>
+        <div id="event-detail_content__actions" className="center-align">
+          <a className="btn-floating btn-medium waves-effect waves-light cyan darken-1">
+            <i className="material-icons">location_on</i>
+          </a>
+          <a
+            className="btn-floating btn-medium waves-effect waves-light cyan darken-1"
+            style={{ margin: "0 15px" }}
+          >
+            <i className="material-icons">bookmark_border</i>
+          </a>
+          <a className="btn-floating btn-medium waves-effect waves-light cyan darken-1">
+            <i className="material-icons">info_outline</i>
           </a>
         </div>
       </div>
@@ -63,7 +70,7 @@ const EventDashboard = () => {
   return (
     <div>
       <div className="SideControl container col l3 indigo darken-2">
-        <div className="col l2 left MiniNav indigo darken-3">
+        {/* <div className="col l2 left MiniNav indigo darken-3">
           <div>
             <a className="btn-floating btn-medium  waves-effect waves-light indigo darken-4">
               <i className="material-icons">person</i>
@@ -78,7 +85,8 @@ const EventDashboard = () => {
               <i className="material-icons">location_city</i>
             </a>
           </div>
-        </div>
+        </div> */}
+        <MiniNav />
         <div id="event-detail" className="col l10 indigo lighten-4">
           {renderEventDetail}
         </div>
