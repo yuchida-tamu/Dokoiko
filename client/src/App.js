@@ -1,6 +1,7 @@
 import "./App.css";
-
-import EventDashboard from "./containers/EventDashboard";
+import { Switch, Route, Link } from "react-router-dom";
+import EventDashboard from "./containers/EventDashboard/EventDashboard";
+import PlaceDashboard from "./containers/PlaceDashboard/PlaceDashboard";
 
 function App() {
   return (
@@ -13,20 +14,26 @@ function App() {
             </a>
             <ul className="right hide-on-med-and-down">
               <li>
-                <a>Users</a>
+                <Link to="/">Users</Link>
               </li>
               <li>
-                <a>Events</a>
+                <Link to="/events">Events</Link>
               </li>
               <li>
-                <a>Login</a>
+                <Link to="/places">Places</Link>
+              </li>
+              <li>
+                <Link to="/">Login</Link>
               </li>
             </ul>
           </div>
         </nav>
       </header>
       <main className="Main row">
-        <EventDashboard />
+        <Switch>
+          <Route path="/events" component={EventDashboard} />
+          <Route path="/places" component={PlaceDashboard} />
+        </Switch>
       </main>
     </div>
   );
