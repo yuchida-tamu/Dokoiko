@@ -1,4 +1,3 @@
-import TEST_PHOTO_PATH from "../test.jpg";
 export const testEvent = [
   {
     id: "testid1",
