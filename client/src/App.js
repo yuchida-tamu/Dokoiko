@@ -6,8 +6,8 @@ import PlaceDashboard from "./containers/PlaceDashboard/PlaceDashboard";
 function App() {
   return (
     <div className="App">
-      <header>
-        <nav>
+      <header className="Header">
+        <nav style={{ height: "100%" }}>
           <div className="nav-wrapper indigo darken-4">
             <a href="#" className="brand-logo">
               DOKOIKO
@@ -29,12 +29,12 @@ function App() {
           </div>
         </nav>
       </header>
-      <main className="Main row">
+      <div className="Main row">
         <Switch>
           <Route path="/events" component={EventDashboard} />
           <Route path="/places" component={PlaceDashboard} />
         </Switch>
-      </main>
+      </div>
     </div>
   );
 }

@@ -7,7 +7,12 @@ const initialPlaces = [...testPlaceNew];
 
 const PlaceDashboard = () => {
   const [places, setPlaces] = useState(initialPlaces);
+  const [isExpanded, setIsExpanded] = useState(true);
 
+  const expandHandler = () => {
+    const bool = !isExpanded;
+    setIsExpanded(bool);
+  };
   const clickHnadler = () => {
     console.log("click places");
   };
@@ -15,17 +20,32 @@ const PlaceDashboard = () => {
     <ItemCard item={place} click={clickHnadler} />
   ));
 
+  const dashboardStyle = isExpanded
+    ? "dashboard-framework dashboard-framework-expanded "
+    : "dashboard-framework dashboard-framework-shrinked ";
+
+  const dashboardIcon = isExpanded ? "expand_more" : "expand_less";
+
   return (
-    <div>
+    <div className="row Main-container" style={{ height: "90vh" }}>
       <div className="SideControl container col l3 indigo darken-2">
         <MiniNav />
         <div className="event-detail col l10 indigo lighten-4"></div>
       </div>
-      <div className="indigo darken-2 dashboard-control-bar valign-wrapper">
-        <i className="small material-icons">expand_more</i>
-      </div>
-      <div className="col l9 dashboard">
-        <ul className="row">{renderPlaces}</ul>
+      <div className="col l9 content-frame">
+        <div className={dashboardStyle}>
+          <div
+            className="indigo darken-3 dashboard-control-bar valign-wrapper"
+            onClick={expandHandler}
+          >
+            <i className="small material-icons ">{dashboardIcon}</i>
+          </div>
+          <div className="col l12 dashboard">
+            <ul className="row" style={{ height: "100%" }}>
+              {renderPlaces}
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 .App {
   text-align: center;
+  height: 100vh;
 }
 
 .App-logo {
@@ -20,8 +21,12 @@
 
 .Main {
   height: 90vh;
-  padding: 0;
+  padding: 0 !important;
   margin: 0;
+}
+
+.Main-container {
+  margin: 0 !important;
 }
 
 @keyframes App-logo-spin {
