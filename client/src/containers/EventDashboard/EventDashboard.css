@@ -53,19 +53,46 @@ div.SideControl {
   overflow: scroll;
   background-color: #10164b;
 }
+
+.content-frame {
+  padding: 0 !important;
+  height: 100%;
+  position: relative;
+}
+
+.dashboard-framework {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  transition: 0.2s;
+}
+
+.dashboard-framework-expanded {
+  height: 90vh;
+}
+
+.dashboard-framework-shrinked {
+  height: 20vh;
+}
+
 .dashboard {
-  height: 85vh;
+  height: 100%;
   overflow: scroll;
   background-color: #10164b;
+  box-shadow: inset 0em 0.1em 1em rgba(28, 1, 43, 0.575);
 }
 
 .dashboard-control-bar {
-  height: 5vh;
+  position: absolute;
+  width: 100%;
+  height: 1em;
   padding: 1px;
   color: white;
   display: flex;
   justify-content: center;
   cursor: pointer;
+  z-index: 1000;
+  box-shadow: 0.1em 0.1em 1em rgba(28, 1, 43, 0.575);
 }
 
 .event-detail {
