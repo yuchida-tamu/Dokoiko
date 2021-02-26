@@ -127,3 +127,39 @@ div.SideControl {
 .item-card {
   cursor: pointer;
 }
+
+.user-dashboard h4 {
+  padding: 10px 0 !important;
+  margin: 0 !important;
+}
+
+.user-dashboard__frame {
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: space-between;
+}
+
+.user-dashboard__avator {
+  width: 150px;
+  height: 150px;
+  border-radius: 10px;
+  margin-top: 15px;
+}
+
+.user-dashboard__collection {
+  border: none !important;
+  width: 300px;
+}
+.user-dashboard__collection li {
+  cursor: pointer;
+}
+
+.user-dashboard__detail {
+  height: 100%;
+  width: 50%;
+
+  margin-left: 15px;
+  padding: 15px 0;
+}
