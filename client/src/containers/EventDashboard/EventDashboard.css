@@ -161,5 +161,10 @@ div.SideControl {
   width: 50%;
 
   margin-left: 15px;
-  padding: 15px 0;
+  padding: 15px 10px;
+}
+
+.user-dashboard__detail h4,
+.user-dashboard__detail h5 {
+  color: #b0bec5;
 }

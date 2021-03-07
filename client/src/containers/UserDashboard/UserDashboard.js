@@ -1,5 +1,11 @@
 import React, { useState } from "react";
 import UserEditForm from "../../components/UserEditForm/UserEditForm";
+import { visitingEvents } from "../../testData/eventLists";
+import { panelTypes } from "./panelTypes";
+import { Link, Route, Switch } from "react-router-dom";
+
+//visiting events hold id of eventlist
+//favorite events hold id of event
 
 const currentUser = {
   username: "yutaside",
@@ -19,12 +25,14 @@ const currentUser = {
 };
 
 const UserDashboard = () => {
+  /*Data*/
   const [user, setUser] = useState(currentUser);
   const [username, setUsername] = useState(currentUser.username);
   const [firstName, setFirstName] = useState(currentUser.first_name);
   const [lastName, setLastName] = useState(currentUser.last_name);
   const [email, setEmail] = useState(currentUser.email);
   const [password, setPassword] = useState(currentUser.password);
+  const [visitPlans, setVisitPlans] = useState([]);
 
   const onUsernameChangeHandler = (event) => {
     setUsername(event.target.value);
@@ -41,6 +49,34 @@ const UserDashboard = () => {
   const onSubmitHandler = (event) => {
     event.preventDefault();
   };
+  const onOpenPlansHandler = () => {
+    //in production, this uses the actual data fetched from api
+    //using ids provided by the user(current_user)
+    //const visitingEvents = fetchEventLists(id)
+    setVisitPlans(visitingEvents);
+  };
+  //TODO: IMPLEMENT fetchEventLists()
+  const fetchEventLists = () => {};
+
+  const panelSwitchHandler = (TYPE) => {};
+
+  const renderEventLists = visitPlans.map((list) => (
+    <li key={list._id}>
+      <h5>{list.name}</h5>
+    </li>
+  ));
+
+  const tempComponent = (
+    <div>
+      <h4>
+        <span>
+          <i className="material-icons small">book</i>
+        </span>
+        Plans
+      </h4>
+      <ul>{renderEventLists}</ul>
+    </div>
+  );
 
   return (
     <div className="user-dashboard__frame indigo lighten-4 container">
@@ -57,7 +93,10 @@ const UserDashboard = () => {
         <li className="collection-item indigo lighten-4 left-align">
           {user.email}
         </li>
-        <li className="collection-item indigo lighten-4 left-align">
+        <li
+          className="collection-item indigo lighten-4 left-align"
+          onClick={onOpenPlansHandler}
+        >
           Plans
           <span className="badge">
             {user.visiting_events.length + user.visiting_places.length}
@@ -71,6 +110,7 @@ const UserDashboard = () => {
         </li>
       </ul>
       <div className="user-dashboard__detail indigo lighten-5">
+        {/* TEMPORARILY DISABLED FOR DEV PURPOSES
         <UserEditForm
           firstName={firstName}
           lastName={lastName}
@@ -81,7 +121,24 @@ const UserDashboard = () => {
           onUsernameChange={onUsernameChangeHandler}
           onEmailChange={onEmailChangeHandler}
           onSubmit={onSubmitHandler}
-        />
+        /> */}
+        <Switch>
+          <Route
+            exact
+            to="user/edit"
+            component={UserEditForm}
+            firstName={firstName}
+            lastName={lastName}
+            username={username}
+            email={email}
+            onFirstNameChange={onFisrtNameChangeHandler}
+            onLastNameChange={onLastNameChangeHandler}
+            onUsernameChange={onUsernameChangeHandler}
+            onEmailChange={onEmailChangeHandler}
+            onSubmit={onSubmitHandler}
+          />
+          <Route exact to="user/plans" component={tempComponent} />
+        </Switch>
       </div>
     </div>
   );
