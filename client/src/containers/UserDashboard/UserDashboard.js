@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 import UserEditForm from "../../components/UserEditForm/UserEditForm";
 import { visitingEvents } from "../../testData/eventLists";
+import {testEvent} from "../../testData/events";
+import {testPlaceNew} from "../../testData/places";
 import { panelTypes } from "./panelTypes";
-import { Link, Route, Switch } from "react-router-dom";
+
 
 //visiting events hold id of eventlist
 //favorite events hold id of event
@@ -33,6 +35,19 @@ const UserDashboard = () => {
   const [email, setEmail] = useState(currentUser.email);
   const [password, setPassword] = useState(currentUser.password);
   const [visitPlans, setVisitPlans] = useState([]);
+  const [currentPanelShown, setCurrentPanelShown] = useState(panelTypes.USER_FORM);
+  const [favoritePlaces, setFavoritePlaces] = useState([]);
+  const [favoriteEvents, setFavoriteEvents] = useState([])
+
+  /*
+    Fetch data onload 
+  */
+  useEffect(() => {
+    fetchEventLists();
+    fetchFavoriteEvents();
+    fetchFavoritePlaces()
+  }, [])
+
 
   const onUsernameChangeHandler = (event) => {
     setUsername(event.target.value);
@@ -49,16 +64,45 @@ const UserDashboard = () => {
   const onSubmitHandler = (event) => {
     event.preventDefault();
   };
+const onOpenUserFormHandler = () => {
+  setCurrentPanelShown(panelTypes.USER_FORM);
+}
+
   const onOpenPlansHandler = () => {
     //in production, this uses the actual data fetched from api
     //using ids provided by the user(current_user)
     //const visitingEvents = fetchEventLists(id)
-    setVisitPlans(visitingEvents);
+    setVisitPlans(visitingEvents);//TODO: use useEffect to preload lists instead of fetching data here
+    setCurrentPanelShown(panelTypes.PLANS)
+    
   };
-  //TODO: IMPLEMENT fetchEventLists()
-  const fetchEventLists = () => {};
+  const onOpenFavoritesHandler = ()=> {
+    setCurrentPanelShown(panelTypes.FAVORITES)
+    
+  }
 
-  const panelSwitchHandler = (TYPE) => {};
+  //TODO: IMPLEMENT fetchEventLists()
+  const fetchEventLists = () => { };
+
+  const fetchFavoritePlaces = () => {
+    //Temporary logic for dev purposes
+    //in production, it fetches data from api
+    let tempArr = []
+    for(let i = 0; i < user.favorite_places.length.length; i++){
+      tempArr.push(testPlaceNew[i])
+    }
+    setFavoritePlaces(tempArr)
+  }
+
+  const fetchFavoriteEvents = () => {
+    //Temporary logic for dev purposes
+    //in profuction, it fetches data from api
+        let tempArr = []
+    for(let i = 0; i < user.favorite_events.length.length; i++){
+      tempArr.push(testEvent[i])
+    }
+    setFavoriteEvents(tempArr)
+  }
 
   const renderEventLists = visitPlans.map((list) => (
     <li key={list._id}>
@@ -66,31 +110,71 @@ const UserDashboard = () => {
     </li>
   ));
 
-  const tempComponent = (
-    <div>
-      <h4>
-        <span>
-          <i className="material-icons small">book</i>
-        </span>
-        Plans
-      </h4>
-      <ul>{renderEventLists}</ul>
-    </div>
-  );
+  // const renderFavoriteEvents = favoriteEvents.map(event => {
+  //   return <li>event.name</li>
+  // })
 
+  
+  // const renderFavoritePlaces = favoritePlaces.map(place => {
+  //   return <li>place.name</li>
+  // })
+
+  const panelSwitchHandler = (TYPE) => { };
+  
+  
+  const renderUserForm = currentPanelShown === panelTypes.USER_FORM?<UserEditForm
+    firstName={firstName}
+    lastName={lastName}
+    username={username}
+    email={email}
+    onFirstNameChange={onFisrtNameChangeHandler}
+    onLastNameChange={onLastNameChangeHandler}
+    onUsernameChange={onUsernameChangeHandler}
+    onEmailChange={onEmailChangeHandler}
+    onSubmit={onSubmitHandler}
+  /> : null; 
+  
+  const renderPlans = currentPanelShown === panelTypes.PLANS?<ul>{renderEventLists}</ul>:null;
+
+  const renderFavorites = currentPanelShown === panelTypes.FAVORITES?(
+    <Fragment>
+      <ul className="favorite-list">
+        <li className="favorite-list__item favorite-list__item__places">
+          <span>Favorite Places
+          <span className="badge">
+            {user.favorite_places.length}
+          </span>
+          </span>
+          <div >
+           {/* {renderFavoritePlaces} */}
+          </div>
+        </li>
+        <li className="favorite-list__item favorite-list__item__events">
+          Favorite Events
+          <span className="badge">
+            {user.favorite_events.length}
+          </span>
+          <div >
+           {/* {renderFavoriteEvents} */}
+          </div>
+        </li>
+      </ul>
+    </Fragment>):null;
+
+  
   return (
     <div className="user-dashboard__frame indigo lighten-4 container">
       <ul className="collection user-dashboard__collection">
-        <li className="collection-item indigo lighten-4 center-align">
+        <li className="collection-item indigo lighten-4 center-align" onClick={onOpenUserFormHandler}>
           <div className="user-dashboard user-dashboard__avator indigo lighten-5"></div>
         </li>
-        <li className="collection-item indigo lighten-4 left-align">
+        <li className="collection-item indigo lighten-4 left-align" onClick={onOpenUserFormHandler}>
           {user.username}
         </li>
-        <li className="collection-item indigo lighten-4 left-align">
+        <li className="collection-item indigo lighten-4 left-align" onClick={onOpenUserFormHandler}>
           {user.first_name} {user.last_name}
         </li>
-        <li className="collection-item indigo lighten-4 left-align">
+        <li className="collection-item indigo lighten-4 left-align" onClick={onOpenUserFormHandler}>
           {user.email}
         </li>
         <li
@@ -102,7 +186,9 @@ const UserDashboard = () => {
             {user.visiting_events.length + user.visiting_places.length}
           </span>
         </li>
-        <li className="collection-item indigo lighten-4 left-align">
+        <li className="collection-item indigo lighten-4 left-align"
+          onClick = {onOpenFavoritesHandler}
+          >
           Favorites
           <span className="badge">
             {user.favorite_events.length + user.favorite_places.length}
@@ -110,35 +196,9 @@ const UserDashboard = () => {
         </li>
       </ul>
       <div className="user-dashboard__detail indigo lighten-5">
-        {/* TEMPORARILY DISABLED FOR DEV PURPOSES
-        <UserEditForm
-          firstName={firstName}
-          lastName={lastName}
-          username={username}
-          email={email}
-          onFirstNameChange={onFisrtNameChangeHandler}
-          onLastNameChange={onLastNameChangeHandler}
-          onUsernameChange={onUsernameChangeHandler}
-          onEmailChange={onEmailChangeHandler}
-          onSubmit={onSubmitHandler}
-        /> */}
-        <Switch>
-          <Route
-            exact
-            to="user/edit"
-            component={UserEditForm}
-            firstName={firstName}
-            lastName={lastName}
-            username={username}
-            email={email}
-            onFirstNameChange={onFisrtNameChangeHandler}
-            onLastNameChange={onLastNameChangeHandler}
-            onUsernameChange={onUsernameChangeHandler}
-            onEmailChange={onEmailChangeHandler}
-            onSubmit={onSubmitHandler}
-          />
-          <Route exact to="user/plans" component={tempComponent} />
-        </Switch>
+        {renderUserForm}
+        {renderPlans}
+        {renderFavorites}
       </div>
     </div>
   );
