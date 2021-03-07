@@ -2,6 +2,7 @@ import "./App.css";
 import { Switch, Route, Link } from "react-router-dom";
 import EventDashboard from "./containers/EventDashboard/EventDashboard";
 import PlaceDashboard from "./containers/PlaceDashboard/PlaceDashboard";
+import UserDashboard from "./containers/UserDashboard/UserDashboard";
 
 function App() {
   return (
@@ -14,7 +15,7 @@ function App() {
             </a>
             <ul className="right hide-on-med-and-down">
               <li>
-                <Link to="/">Users</Link>
+                <Link to="/user">User</Link>
               </li>
               <li>
                 <Link to="/events">Events</Link>
@@ -29,10 +30,11 @@ function App() {
           </div>
         </nav>
       </header>
-      <div className="Main row">
+      <div className="Main row indigo lighten-4">
         <Switch>
-          <Route path="/events" component={EventDashboard} />
-          <Route path="/places" component={PlaceDashboard} />
+          <Route extact path="/user" component={UserDashboard} />
+          <Route extact path="/events" component={EventDashboard} />
+          <Route extact path="/places" component={PlaceDashboard} />
         </Switch>
       </div>
     </div>
