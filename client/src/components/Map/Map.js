@@ -11,7 +11,12 @@ const Map = ({ location }) => {
         bootstrapURLKeys={{
           key: process.env.GOOGLE_MAP_KEY || keys.GOOGLE_MAP_KEY,
         }}
-        defaultCenter={{ lat, lng }}
+        defaultCenter={
+          { lat, lng } || {
+            lat: 59.95,
+            lng: 30.33,
+          }
+        }
         defaultZoom={zoom}
         center={{ lat, lng }}
       ></GoogleMapReact>
