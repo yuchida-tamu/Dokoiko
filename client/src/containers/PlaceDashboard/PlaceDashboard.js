@@ -11,7 +11,7 @@ const initialPlaces = [...testPlaceNew];
 const PlaceDashboard = () => {
   const [places, setPlaces] = useState(initialPlaces);
   const [isExpanded, setIsExpanded] = useState(true);
-  const [placeSelected, setPlaceSelected] = useState();
+  const [placeSelected, setPlaceSelected] = useState(places[0]);
 
   const fetchPlaces = () => {};
 
@@ -51,9 +51,16 @@ const PlaceDashboard = () => {
     //update selectedPlace
     setPlaceSelected(place);
   };
+
+  //horizontally scroll the list only when the dashboard is shrinked
+  const onWheelScrollHandler = event => {
+    //Do something(horizontal scroll logic?)
+  };
+
   const renderPlaces = places.map(place => (
     <ItemCard
       item={place}
+      isExpanded={isExpanded}
       click={() => {
         clickHnadler(place);
       }}
@@ -63,6 +70,10 @@ const PlaceDashboard = () => {
   const dashboardStyle = isExpanded
     ? 'dashboard-framework dashboard-framework-expanded '
     : 'dashboard-framework dashboard-framework-shrinked ';
+
+  const placeListStyle = isExpanded
+    ? 'col l12 dashboard place-list-expanded'
+    : ' dashboard place-list-shrinked';
 
   const map = isExpanded ? null : <Map location={placeSelected.location} />;
 
@@ -85,11 +96,16 @@ const PlaceDashboard = () => {
           >
             <i className='small material-icons '>{dashboardIcon}</i>
           </div>
-          <div className='col l12 dashboard'>
-            <ul className='row' style={{ height: '100%' }}>
-              {renderPlaces}
-            </ul>
-          </div>
+
+          <ul
+            className={placeListStyle}
+            style={{ height: '100%' }}
+            onWheel={onWheelScrollHandler}
+          >
+            <div class='l1'></div>
+            {renderPlaces}
+            <div class='l1'></div>
+          </ul>
         </div>
       </div>
     </div>
