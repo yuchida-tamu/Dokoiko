@@ -208,3 +208,144 @@ div.SideControl {
 .user-dashboard__detail h5 {
   color: #b0bec5;
 }
+
+/*
+  Place Dashboard Style
+*/
+
+.content-frame {
+  padding: 0 !important;
+  height: 100%;
+  position: relative;
+}
+
+.dashboard-framework {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  transition: 0.2s;
+}
+
+.dashboard-framework-expanded {
+  height: 90vh;
+}
+
+.dashboard-framework-shrinked {
+  height: 20vh;
+  width: 100%;
+}
+
+.dashboard {
+  height: 100%;
+  overflow: scroll;
+  background-color: #252844;
+  /* box-shadow: inset 0em 0.1em 1em rgba(28, 1, 43, 0.575); */
+}
+
+.dashboard-control-bar {
+  position: absolute;
+  width: 100%;
+  height: 1em;
+  padding: 1px;
+  color: white;
+  display: flex;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1000;
+  /* box-shadow: 0.1em 0.1em 1em rgba(28, 1, 43, 0.575); */
+}
+
+.place-list-expanded {
+}
+
+.place-list-shrinked {
+  overflow-y: hidden;
+  overflow-x: scroll;
+  white-space: nowrap;
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+.place-list-shrinked li {
+  float: left;
+}
+
+.item-card {
+  cursor: pointer;
+  height: 250px;
+  width: 256px;
+  min-width: 128px;
+  margin: 15px 5px;
+}
+
+.item-card .card {
+  height: 100%;
+  width: 100%;
+  min-width: 100%;
+}
+
+.card-title {
+  color: #fff;
+  font-weight: 400 !important;
+}
+
+.card-content {
+  color: rgb(197, 196, 196);
+}
+
+.item-card-shrinked {
+  width: 256px;
+  min-width: 256px;
+  height: 80%;
+  padding: 0 15px;
+}
+
+.item-card-shrinked .card-title {
+  font-size: 1.5em !important;
+  font-weight: 300 !important;
+}
+
+/*
+Auth Form
+*/
+
+#auth-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+  width: 512px;
+  height: 560px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -59%);
+  background-color: rgba(64, 147, 216, 0.1);
+  box-shadow: 0 8px 24px 4px rgb(32, 17, 29);
+  border-radius: 8px;
+}
+
+#auth-card__form {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+  width: 100%;
+  height: 480px;
+}
+
+#auth-card h2 {
+  display: inline-block;
+  color: #263238;
+}
+
+#auth-card__form input {
+  width: 80%;
+  min-width: 312px;
+  padding: 0 16px;
+  border-radius: 4px;
+}
+
+#auth-btn {
+  justify-self: last baseline;
+}
