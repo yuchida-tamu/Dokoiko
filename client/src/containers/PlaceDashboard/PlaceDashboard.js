@@ -1,16 +1,52 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import MiniNav from '../../components/MiniNav/MiniNav';
 import ItemCard from '../../components/ItemCard/ItemCard';
 import { testPlaceNew } from '../../testData/places';
 import Map from '../../components/Map/Map';
+
+import { useCurrentUserContext } from '../../contexts/CurrentUserContext';
+
 //temporary photo data
 import photo from '../../testData/photos/gallery.jpg';
 const initialPlaces = [...testPlaceNew];
 
 const PlaceDashboard = () => {
+  //current_user state
+  const { user, setUser } = useCurrentUserContext();
+
   const [places, setPlaces] = useState(initialPlaces);
   const [isExpanded, setIsExpanded] = useState(true);
   const [placeSelected, setPlaceSelected] = useState(places[0]);
+
+  //only when the component is rendered for the first time
+  useEffect(() => {
+    fetchPlaces();
+  }, []);
+  //fetch places data and set it to the state
+  const fetchPlaces = () => {
+    axios
+      .get('/api/v1/place')
+      .then(response => {
+        setPlaces(response.data.places);
+      })
+      .catch(err => console.log('error: ', err));
+  };
+
+  //when the bookmark icon is clicked, add the event to the users favorite list(by adding its place_id)
+  const onClickBookmarkHandler = () => {
+    //check if the id already exists in the user's favorite list
+    if (user.favorite_places.includes(placeSelected.place_id))
+      return console.log('its alreadt added', user.favorite_places);
+    let updatedArr = [...user.favorite_places];
+    updatedArr.push(placeSelected.place_id);
+    setUser({
+      ...user,
+      favorite_places: updatedArr,
+    });
+  };
+
+  //Should I change the backend api so that the item track isBookmarked?
 
   const renderPlaceDetail = placeSelected ? (
     <div>
@@ -29,6 +65,7 @@ const PlaceDashboard = () => {
           <a
             className='btn-floating btn-medium waves-effect waves-light cyan darken-1'
             style={{ margin: '0 15px' }}
+            onClick={onClickBookmarkHandler}
           >
             <i className='material-icons'>bookmark_border</i>
           </a>
@@ -56,6 +93,7 @@ const PlaceDashboard = () => {
 
   const renderPlaces = places.map(place => (
     <ItemCard
+      key={place.id || place.place_id}
       item={place}
       isExpanded={isExpanded}
       click={() => {
@@ -65,8 +103,8 @@ const PlaceDashboard = () => {
   ));
 
   const dashboardStyle = isExpanded
-    ? 'dashboard-framework dashboard-framework-expanded '
-    : 'dashboard-framework dashboard-framework-shrinked ';
+    ? 'dashboard-framework dashboard-framework-expanded l9'
+    : 'dashboard-framework dashboard-framework-shrinked l9';
 
   const placeListStyle = isExpanded
     ? 'col l12 dashboard place-list-expanded'
@@ -99,9 +137,9 @@ const PlaceDashboard = () => {
             style={{ height: '100%' }}
             onWheel={onWheelScrollHandler}
           >
-            <div class='l1'></div>
+            <div className='l1'></div>
             {renderPlaces}
-            <div class='l1'></div>
+            <div className='l1'></div>
           </ul>
         </div>
       </div>

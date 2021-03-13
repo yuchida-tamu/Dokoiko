@@ -94,6 +94,47 @@ div.SideControl {
   background-color: #10164b;
 }
 
+.content-frame {
+  padding: 0 !important;
+  height: 100%;
+  position: relative;
+}
+
+.dashboard-framework {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  transition: 0.2s;
+}
+
+.dashboard-framework-expanded {
+  height: 90vh;
+}
+
+.dashboard-framework-shrinked {
+  height: 20vh;
+}
+
+.dashboard {
+  height: 100%;
+  overflow: scroll;
+  background-color: #10164b;
+  box-shadow: inset 0em 0.1em 1em rgba(28, 1, 43, 0.575);
+}
+
+.dashboard-control-bar {
+  position: absolute;
+  width: 100%;
+  height: 1em;
+  padding: 1px;
+  color: white;
+  display: flex;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1000;
+  box-shadow: 0.1em 0.1em 1em rgba(28, 1, 43, 0.575);
+}
+
 .event-detail {
   color: #263238;
   height: 100%;
@@ -120,6 +161,10 @@ div.SideControl {
 }
 
 .event-card {
+  cursor: pointer;
+}
+
+.item-card {
   cursor: pointer;
 }
 
@@ -183,6 +228,7 @@ div.SideControl {
 
 .dashboard-framework-expanded {
   height: 90vh;
+  width: 100%;
 }
 
 .dashboard-framework-shrinked {
@@ -192,6 +238,7 @@ div.SideControl {
 
 .dashboard {
   height: 100%;
+  width: 100%;
   overflow: scroll;
   background-color: #252844;
   /* box-shadow: inset 0em 0.1em 1em rgba(28, 1, 43, 0.575); */
