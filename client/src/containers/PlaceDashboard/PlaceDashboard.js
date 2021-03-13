@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import MiniNav from '../../components/MiniNav/MiniNav';
 import ItemCard from '../../components/ItemCard/ItemCard';
 import { testPlaceNew } from '../../testData/places';
@@ -11,6 +12,8 @@ const PlaceDashboard = () => {
   const [places, setPlaces] = useState(initialPlaces);
   const [isExpanded, setIsExpanded] = useState(true);
   const [placeSelected, setPlaceSelected] = useState();
+
+  const fetchPlaces = () => {};
 
   const renderPlaceDetail = placeSelected ? (
     <div>
