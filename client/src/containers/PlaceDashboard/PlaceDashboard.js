@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import MiniNav from '../../components/MiniNav/MiniNav';
 import ItemCard from '../../components/ItemCard/ItemCard';
@@ -13,7 +13,21 @@ const PlaceDashboard = () => {
   const [isExpanded, setIsExpanded] = useState(true);
   const [placeSelected, setPlaceSelected] = useState(places[0]);
 
-  const fetchPlaces = () => {};
+  useEffect(() => {
+    fetchPlaces();
+  }, []);
+
+  //fetch places data and set it to the state
+  //only when the component is rendered for the first time
+  const fetchPlaces = () => {
+    axios
+      .get('/api/v1/place')
+      .then(response => {
+        console.log('response: ', response);
+        setPlaces(response.data.places);
+      })
+      .catch(err => console.log('error: ', err));
+  };
 
   const renderPlaceDetail = placeSelected ? (
     <div>
@@ -68,8 +82,8 @@ const PlaceDashboard = () => {
   ));
 
   const dashboardStyle = isExpanded
-    ? 'dashboard-framework dashboard-framework-expanded '
-    : 'dashboard-framework dashboard-framework-shrinked ';
+    ? 'dashboard-framework dashboard-framework-expanded l9'
+    : 'dashboard-framework dashboard-framework-shrinked l9';
 
   const placeListStyle = isExpanded
     ? 'col l12 dashboard place-list-expanded'

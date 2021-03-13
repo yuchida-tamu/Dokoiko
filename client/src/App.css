@@ -228,6 +228,7 @@ div.SideControl {
 
 .dashboard-framework-expanded {
   height: 90vh;
+  width: 100%;
 }
 
 .dashboard-framework-shrinked {
@@ -237,6 +238,7 @@ div.SideControl {
 
 .dashboard {
   height: 100%;
+  width: 100%;
   overflow: scroll;
   background-color: #252844;
   /* box-shadow: inset 0em 0.1em 1em rgba(28, 1, 43, 0.575); */
