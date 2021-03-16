@@ -33,11 +33,21 @@ const PlaceDashboard = () => {
       .catch(err => console.log('error: ', err));
   };
 
-  //when the bookmark icon is clicked, add the event to the users favorite list(by adding its place_id)
-  const onClickBookmarkHandler = () => {
+  //when the favorite icon is clicked, add the event to the users favorite list(by adding its place_id)
+  //toggles it
+  const onClickFavoriteHandler = () => {
     //check if the id already exists in the user's favorite list
-    if (user.favorite_places.includes(placeSelected.place_id))
-      return console.log('its alreadt added', user.favorite_places);
+    if (user.favorite_places.includes(placeSelected.place_id)) {
+      const removed = user.favorite_places.filter(
+        p => p != placeSelected.place_id
+      );
+      setUser({
+        ...user,
+        favorite_places: removed,
+      });
+
+      return;
+    }
     let updatedArr = [...user.favorite_places];
     updatedArr.push(placeSelected.place_id);
     setUser({
@@ -46,7 +56,7 @@ const PlaceDashboard = () => {
     });
   };
 
-  //Should I change the backend api so that the item track isBookmarked?
+  //Should I change the backend api so that the item track isFavoriteed?
 
   const renderPlaceDetail = placeSelected ? (
     <div>
@@ -59,19 +69,23 @@ const PlaceDashboard = () => {
           <br />
         </div>
         <div id='event-detail_content__actions' className='center-align'>
-          <a className='btn-floating btn-medium waves-effect waves-light cyan darken-1'>
+          <div className='btn-floating btn-medium waves-effect waves-light cyan darken-1'>
             <i className='material-icons'>location_on</i>
-          </a>
-          <a
+          </div>
+          <div
             className='btn-floating btn-medium waves-effect waves-light cyan darken-1'
             style={{ margin: '0 15px' }}
-            onClick={onClickBookmarkHandler}
+            onClick={onClickFavoriteHandler}
           >
-            <i className='material-icons'>bookmark_border</i>
-          </a>
-          <a className='btn-floating btn-medium waves-effect waves-light cyan darken-1'>
+            <i className='material-icons'>
+              {user.favorite_places.includes(placeSelected.place_id)
+                ? 'favorite'
+                : 'favorite_border'}
+            </i>
+          </div>
+          <div className='btn-floating btn-medium waves-effect waves-light cyan darken-1'>
             <i className='material-icons'>info_outline</i>
-          </a>
+          </div>
         </div>
       </div>
     </div>
