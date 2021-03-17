@@ -4,6 +4,7 @@ import MiniNav from '../../components/MiniNav/MiniNav';
 import ItemCard from '../../components/ItemCard/ItemCard';
 import { testPlaceNew } from '../../testData/places';
 import Map from '../../components/Map/Map';
+import Modal from '../../components/Modal/Modal';
 
 import { useCurrentUserContext } from '../../contexts/CurrentUserContext';
 
@@ -18,6 +19,7 @@ const PlaceDashboard = () => {
   const [places, setPlaces] = useState(initialPlaces);
   const [isExpanded, setIsExpanded] = useState(true);
   const [placeSelected, setPlaceSelected] = useState(places[0]);
+  const [isShowModal, setIsShowModal] = useState(false);
 
   //only when the component is rendered for the first time
   useEffect(() => {
@@ -56,6 +58,13 @@ const PlaceDashboard = () => {
     });
   };
 
+  const onClickToShowModalHandler = () => {
+    console.log('clilcked');
+    const toggle = !isShowModal;
+    setIsShowModal(toggle);
+    console.log(isShowModal);
+  };
+
   //Should I change the backend api so that the item track isFavoriteed?
 
   const renderPlaceDetail = placeSelected ? (
@@ -69,7 +78,10 @@ const PlaceDashboard = () => {
           <br />
         </div>
         <div id='event-detail_content__actions' className='center-align'>
-          <div className='btn-floating btn-medium waves-effect waves-light cyan darken-1'>
+          <div
+            className='btn-floating btn-medium waves-effect waves-light cyan darken-1'
+            onClick={onClickToShowModalHandler}
+          >
             <i className='material-icons'>location_on</i>
           </div>
           <div
@@ -137,6 +149,7 @@ const PlaceDashboard = () => {
         </div>
       </div>
       <div className='col l9 content-frame'>
+        {isShowModal ? <Modal /> : null}
         {map}
         <div className={dashboardStyle}>
           <div

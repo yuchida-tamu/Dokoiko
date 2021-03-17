@@ -351,3 +351,24 @@ Auth Form
 #auth-btn {
   justify-self: last baseline;
 }
+
+/* Modal */
+.plan-modal {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 3000;
+  width: 50vh;
+  height: 50vh;
+  background: rgb(143, 141, 141);
+  border-radius: 8px;
+}
+
+/* helper */
+.hidden {
+  visibility: hidden;
+}
