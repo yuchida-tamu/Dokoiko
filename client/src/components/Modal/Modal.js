@@ -15,7 +15,7 @@ const Modal = () => {
         <form>
           <input type='input' placeholder='New Plan Name' />
         </form>
-        <button>CREATE</button>
+        <button className='btn plan-form__btn deep-orange '>CREATE</button>
       </div>
       <div className='plan-dropdown'>
         <div

@@ -356,7 +356,7 @@ Auth Form
 .plan-modal {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   position: fixed;
   top: 50%;
   left: 50%;
@@ -364,8 +364,28 @@ Auth Form
   z-index: 3000;
   width: 50vh;
   height: 50vh;
-  background: rgb(143, 141, 141);
+  background: #e8eaf6;
   border-radius: 8px;
+  box-shadow: 0 5px 16px 4px #263238;
+}
+
+.plan-modal form input {
+  border: none;
+  height: 32px;
+  width: 256px;
+  margin-bottom: 8px;
+}
+
+.plan-form {
+  margin: 16px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 20%;
+}
+
+.plan-form__btn {
+  width: 128px;
 }
 
 /* helper */
