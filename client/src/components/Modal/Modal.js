@@ -11,6 +11,10 @@ const Modal = ({ submit, plans }) => {
   /*NOTE
   Change add to existing button to icon to indicate the dropdown menu toggle
   Add "Add" button at the bottom of the drop down menu(hide it while the dropdown is not visible as well)
+
+
+  3/19
+  Need close btn or logic to close when other area is clicked
   */
 
   return (

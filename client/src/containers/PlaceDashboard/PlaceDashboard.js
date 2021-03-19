@@ -134,7 +134,33 @@ const PlaceDashboard = () => {
     //   })
     //   .catch(err => console.log('failed to post new eventlist'));
 
-    console.log(newPlan);
+    //Temp for local test
+    setUser({
+      ...user,
+      plans: [...user.plans, { ...newPlan, user_id: 'testid123' }],
+    });
+
+    console.log('create', user);
+  };
+
+  const onAddToExisitingPlanHandler = plan => {
+    //chech if the place is already added to the plan
+    if (plan.events.filter(evt => evt === placeSelected.id).length > 0)
+      return console.log('this place is already added to the plan');
+
+    //if not, add it to the plan and update the context
+    console.log('events', plan);
+    const updateEvents = [...plan.events, placeSelected.id];
+    const updatePlan = { ...plan, events: updateEvents };
+    const filtered = user.plans.filter(plan => plan.name !== updatePlan.name);
+    const update = [...filtered, updatePlan];
+    console.log('added to the plan: ', user);
+    setUser({
+      ...user,
+      plans: update,
+    });
+
+    console.log('type', typeof user.plans);
   };
 
   const expandHandler = () => {
@@ -163,7 +189,14 @@ const PlaceDashboard = () => {
   ));
 
   const renderPlans = user.plans.map(plan => (
-    <li key={plan.id}>{plan.name}</li>
+    <li
+      key={plan.id}
+      onClick={() => {
+        onAddToExisitingPlanHandler(plan);
+      }}
+    >
+      {plan.name} <span className='badge'>{plan.events.length}</span>
+    </li>
   ));
 
   const dashboardStyle = isExpanded
