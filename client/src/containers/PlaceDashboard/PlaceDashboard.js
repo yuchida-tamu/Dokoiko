@@ -103,6 +103,40 @@ const PlaceDashboard = () => {
     </div>
   ) : null;
 
+  const onSubmitNewPlanHandler = event => {
+    event.preventDefault();
+
+    const planName = event.target[0].value;
+    const date = event.target[1].value;
+    if (!planName) {
+      window.alert('You need to enter Plan Name');
+    }
+    //prepare data object to send to the api
+    const newPlan = {
+      user_id: user.id,
+      name: planName,
+      date: date,
+      events: [placeSelected.id],
+    };
+
+    //send data to the api and save it to db
+    // axios
+    //   .post('/api/v1/eventlist', newPlan)
+    //   .then(response => {
+    //     //response should have the data saved, store that data
+    //     const eventList = response.data.list;
+    //     //user.plans only stores refrences(ids)
+    //     const updatedLists = [...user.plans, eventList];
+    //     setUser({
+    //       ...user,
+    //       plans: updatedLists,
+    //     });
+    //   })
+    //   .catch(err => console.log('failed to post new eventlist'));
+
+    console.log(newPlan);
+  };
+
   const expandHandler = () => {
     const bool = !isExpanded;
     setIsExpanded(bool);
@@ -128,6 +162,10 @@ const PlaceDashboard = () => {
     />
   ));
 
+  const renderPlans = user.plans.map(plan => (
+    <li key={plan.id}>{plan.name}</li>
+  ));
+
   const dashboardStyle = isExpanded
     ? 'dashboard-framework dashboard-framework-expanded l9'
     : 'dashboard-framework dashboard-framework-shrinked l9';
@@ -149,7 +187,9 @@ const PlaceDashboard = () => {
         </div>
       </div>
       <div className='col l9 content-frame'>
-        {isShowModal ? <Modal /> : null}
+        {isShowModal ? (
+          <Modal submit={onSubmitNewPlanHandler} plans={renderPlans} />
+        ) : null}
         {map}
         <div className={dashboardStyle}>
           <div

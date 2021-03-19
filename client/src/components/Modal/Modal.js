@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const Modal = () => {
+const Modal = ({ submit, plans }) => {
   const [isTriggered, setIsTriggered] = useState(false);
 
   const onClickToggleHandler = () => {
@@ -17,7 +17,7 @@ const Modal = () => {
     <div className='plan-modal'>
       <div className='plan-form'>
         <label>New Plan</label>
-        <form>
+        <form onSubmit={submit}>
           <input
             type='input'
             placeholder='New Plan Name'
@@ -31,8 +31,8 @@ const Modal = () => {
             min='2018-01-01'
             max='2999-12-31'
           ></input>
+          <button className='btn plan-form__btn deep-orange '>CREATE</button>
         </form>
-        <button className='btn plan-form__btn deep-orange '>CREATE</button>
       </div>
       <div className='plan-dropdown'>
         <h5>Add to existing plans</h5>
@@ -47,9 +47,7 @@ const Modal = () => {
             isTriggered ? 'plan-dropdown__content' : 'plan-dropdown__content'
           }
         >
-          <li>plan one</li>
-          <li className='divider'></li>
-          <li>plan two</li>
+          {plans}
         </ul>
       </div>
     </div>
