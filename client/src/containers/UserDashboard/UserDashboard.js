@@ -34,7 +34,7 @@ const UserDashboard = () => {
   const [lastName, setLastName] = useState(user.last_name);
   const [email, setEmail] = useState(user.email);
   const [password, setPassword] = useState(user.password);
-  const [visitPlans, setVisitPlans] = useState([]);
+  //const [visitPlans, setVisitPlans] = useState(user.plans);
   const [currentPanelShown, setCurrentPanelShown] = useState(
     panelTypes.USER_FORM
   );
@@ -103,7 +103,14 @@ const UserDashboard = () => {
     //in production, this uses the actual data fetched from api
     //using ids provided by the user(current_user)
     //const visitingEvents = fetchEventLists(id)
-    setVisitPlans(visitingEvents); //TODO: use useEffect to preload lists instead of fetching data here
+    const plans = user.plans.map(plan => ({ ...plan, isOpen: false }));
+    const updateUser = {
+      ...user,
+      plans: plans,
+    };
+    setUser(updateUser);
+    //setVisitPlans(visitingEvents); //TODO: use useEffect to preload lists instead of fetching data here
+
     setCurrentPanelShown(panelTypes.PLANS);
   };
   const onOpenFavoritesHandler = () => {
@@ -120,8 +127,33 @@ const UserDashboard = () => {
     setisVisibleFavEvt(toggle);
   };
 
+  const onClickPlanHandler = id => {
+    fetchEventLists(id);
+    toggleIsOpen(id);
+  };
+
+  //NOTE: Probably you can refactor this to use it for Favorites List
+  const toggleIsOpen = id => {
+    const target = user.plans.filter(plan => plan._id === id);
+    const update = { ...target[0], isOpen: !target[0].isOpen };
+    const mapped = user.plans.map(plan => {
+      if (plan._id === id) {
+        return update;
+      }
+      return plan;
+    });
+    const updatedPlans = [...mapped];
+
+    const updatedUser = {
+      ...user,
+      plans: updatedPlans,
+    };
+
+    setUser(updatedUser);
+  };
+
   //TODO: IMPLEMENT fetchEventLists()
-  const fetchEventLists = () => {};
+  const fetchEventLists = id => {};
 
   const fetchFavoritePlaces = () => {
     //Temporary logic for dev purposes
@@ -143,9 +175,16 @@ const UserDashboard = () => {
     setFavoriteEvents(tempArr);
   };
 
-  const renderEventLists = visitPlans.map(list => (
-    <li key={list._id}>
+  const renderEventLists = user.plans.map(list => (
+    <li
+      style={{ cursor: 'pointer' }}
+      key={list._id}
+      onClick={() => {
+        onClickPlanHandler(list._id);
+      }}
+    >
       <h5>{list.name}</h5>
+      {list.isOpen ? 'Opened' : null}
     </li>
   ));
 

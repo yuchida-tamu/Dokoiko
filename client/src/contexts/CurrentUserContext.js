@@ -1,4 +1,5 @@
 import React, { useState, createContext, useContext } from 'react';
+import { visitingEvents } from '../testData/eventLists';
 
 const CurrentUserContext = createContext({
   user: {},
@@ -14,7 +15,7 @@ export const CurrentUserContextProvider = ({ children }) => {
     lastName: 'user',
     email: 'test@example.com',
     password: 'testPassword',
-    plans: [],
+    plans: [...visitingEvents],
     favorite_places: [],
     favorite_events: [],
   });
