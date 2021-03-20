@@ -4,7 +4,8 @@ import { visitingEvents } from '../../testData/eventLists';
 import { testEvent } from '../../testData/events';
 import { testPlaceNew } from '../../testData/places';
 import { panelTypes } from './panelTypes';
-
+import { useCurrentUserContext } from '../../contexts/CurrentUserContext';
+import axios from 'axios';
 //visiting events hold id of eventlist
 //favorite events hold id of event
 
@@ -27,12 +28,12 @@ const currentUser = {
 
 const UserDashboard = () => {
   /*Data*/
-  const [user, setUser] = useState(currentUser);
-  const [username, setUsername] = useState(currentUser.username);
-  const [firstName, setFirstName] = useState(currentUser.first_name);
-  const [lastName, setLastName] = useState(currentUser.last_name);
-  const [email, setEmail] = useState(currentUser.email);
-  const [password, setPassword] = useState(currentUser.password);
+  const { user, setUser } = useCurrentUserContext();
+  const [username, setUsername] = useState(user.username);
+  const [firstName, setFirstName] = useState(user.first_name);
+  const [lastName, setLastName] = useState(user.last_name);
+  const [email, setEmail] = useState(user.email);
+  const [password, setPassword] = useState(user.password);
   const [visitPlans, setVisitPlans] = useState([]);
   const [currentPanelShown, setCurrentPanelShown] = useState(
     panelTypes.USER_FORM
@@ -66,6 +67,33 @@ const UserDashboard = () => {
   };
   const onSubmitHandler = event => {
     event.preventDefault();
+
+    //implememt updateUserInfo() to send data to backend
+    const fName = event.target[0].value;
+    const lName = event.target[1].value;
+    const uName = event.target[2].value;
+    const eM = event.target[3].value;
+    const update = {
+      ...user,
+      firstName: fName,
+      lastName: lName,
+      username: uName,
+      email: eM,
+    };
+
+    // axios
+    //   .put(`/api/v1/user/${user.id}`, update)
+    //   .then(response => {
+    //     //retrieve the updated userInfo and set it to the context
+    //     const updatedUser = response.data.user;
+    //     setUser(updatedUser);
+    //   })
+    //   .catch(err => {
+    //     console.error('error: ', err);
+    //   });
+
+    //temporary logic for local dev
+    setUser(update);
   };
   const onOpenUserFormHandler = () => {
     setCurrentPanelShown(panelTypes.USER_FORM);
@@ -156,23 +184,23 @@ const UserDashboard = () => {
   const renderFavorites =
     currentPanelShown === panelTypes.FAVORITES ? (
       <Fragment>
-        <ul className="favorite-list">
+        <ul className='favorite-list'>
           <li
-            className="favorite-list__item favorite-list__item__places"
+            className='favorite-list__item favorite-list__item__places'
             onClick={onOpenFavoritePlacesHandler}
           >
             <span>
               Favorite Places
-              <span className="badge">{user.favorite_places.length}</span>
+              <span className='badge'>{user.favorite_places.length}</span>
             </span>
             <div>{renderFavoritePlaces}</div>
           </li>
           <li
-            className="favorite-list__item favorite-list__item__events"
+            className='favorite-list__item favorite-list__item__events'
             onClick={onOpenFavoriteEventsHandler}
           >
             Favorite Events
-            <span className="badge">{user.favorite_events.length}</span>
+            <span className='badge'>{user.favorite_events.length}</span>
             <div>{renderFavoriteEvents}</div>
           </li>
         </ul>
@@ -180,52 +208,50 @@ const UserDashboard = () => {
     ) : null;
 
   return (
-    <div className="user-dashboard__frame indigo lighten-4 container">
-      <ul className="collection user-dashboard__collection">
+    <div className='user-dashboard__frame indigo lighten-4 container'>
+      <ul className='collection user-dashboard__collection'>
         <li
-          className="collection-item indigo lighten-4 center-align"
+          className='collection-item indigo lighten-4 center-align'
           onClick={onOpenUserFormHandler}
         >
-          <div className="user-dashboard user-dashboard__avator indigo lighten-5"></div>
+          <div className='user-dashboard user-dashboard__avator indigo lighten-5'></div>
         </li>
         <li
-          className="collection-item indigo lighten-4 left-align"
+          className='collection-item indigo lighten-4 left-align'
           onClick={onOpenUserFormHandler}
         >
           {user.username}
         </li>
         <li
-          className="collection-item indigo lighten-4 left-align"
+          className='collection-item indigo lighten-4 left-align'
           onClick={onOpenUserFormHandler}
         >
-          {user.first_name} {user.last_name}
+          {user.firstName} {user.lastName}
         </li>
         <li
-          className="collection-item indigo lighten-4 left-align"
+          className='collection-item indigo lighten-4 left-align'
           onClick={onOpenUserFormHandler}
         >
           {user.email}
         </li>
         <li
-          className="collection-item indigo lighten-4 left-align"
+          className='collection-item indigo lighten-4 left-align'
           onClick={onOpenPlansHandler}
         >
           Plans
-          <span className="badge">
-            {user.visiting_events.length + user.visiting_places.length}
-          </span>
+          <span className='badge'>{user.plans.length}</span>
         </li>
         <li
-          className="collection-item indigo lighten-4 left-align"
+          className='collection-item indigo lighten-4 left-align'
           onClick={onOpenFavoritesHandler}
         >
           Favorites
-          <span className="badge">
+          <span className='badge'>
             {user.favorite_events.length + user.favorite_places.length}
           </span>
         </li>
       </ul>
-      <div className="user-dashboard__detail indigo lighten-5">
+      <div className='user-dashboard__detail indigo lighten-5'>
         {renderUserForm}
         {renderPlans}
         {renderFavorites}
