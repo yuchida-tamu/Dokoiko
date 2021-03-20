@@ -5,6 +5,7 @@ import ItemCard from '../../components/ItemCard/ItemCard';
 import { testPlaceNew } from '../../testData/places';
 import Map from '../../components/Map/Map';
 import Modal from '../../components/Modal/Modal';
+import Backdrop from '../../components/Backdrop/Backdrop';
 
 import { useCurrentUserContext } from '../../contexts/CurrentUserContext';
 
@@ -59,7 +60,6 @@ const PlaceDashboard = () => {
   };
 
   const onClickToShowModalHandler = () => {
-    console.log('clilcked');
     const toggle = !isShowModal;
     setIsShowModal(toggle);
     console.log(isShowModal);
@@ -194,8 +194,11 @@ const PlaceDashboard = () => {
       onClick={() => {
         onAddToExisitingPlanHandler(plan);
       }}
+      className='plan-item valign-wrapper'
     >
-      {plan.name} <span className='badge'>{plan.events.length}</span>
+      <span className='plan-item__name'>{plan.name}</span>
+      <span className='plan-item__date'>{plan.date}</span>
+      <span className='badge plan-item__count'>{plan.events.length}</span>
     </li>
   ));
 
@@ -213,6 +216,7 @@ const PlaceDashboard = () => {
 
   return (
     <div className='row Main-container' style={{ height: '90vh' }}>
+      <Backdrop isVisible={isShowModal} click={onClickToShowModalHandler} />
       <div className='SideControl container col l3 indigo darken-2'>
         <MiniNav />
         <div className='event-detail col l10 indigo lighten-4'>

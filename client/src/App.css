@@ -368,6 +368,7 @@ Auth Form
   background: #e8eaf6;
   border-radius: 8px;
   box-shadow: 0 5px 16px 4px #263238;
+  padding: 0 4px;
 }
 
 .plan-modal form input {
@@ -403,15 +404,16 @@ Auth Form
 
   border-right: none;
   border-left: none;
-  width: 90%;
+  width: 100%;
   height: 60%;
 }
 
 .plan-dropdown h5 {
   display: inline-block;
   width: 100%;
+  height: 36px;
   margin-top: 0;
-  padding: 4px 0;
+  padding: 4px 8px !important;
   text-align: left;
 }
 
@@ -430,7 +432,35 @@ Auth Form
 }
 .plan-dropdown__content li {
   cursor: pointer;
-  margin: 0 16px;
+}
+
+.plan-item {
+  display: flex;
+  width: 100%;
+  padding: 0 8px;
+  justify-content: space-between;
+  background-color: #c5cae9;
+  border-bottom: 1px solid #607d8b;
+}
+.plan-item span {
+  display: block;
+}
+
+.plan-item__name {
+  font-size: 1.5em;
+  color: #006064;
+}
+
+/* Backdrop */
+.backdrop_dark {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  z-index: 2500 !important;
+  background: black;
+  opacity: 0.5 !important;
+  height: 100vh;
+  width: 100vw;
 }
 
 /* helper */
