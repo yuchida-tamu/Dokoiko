@@ -1,4 +1,5 @@
 import React, { useState, createContext, useContext } from 'react';
+import { visitingEvents } from '../testData/eventLists';
 
 const CurrentUserContext = createContext({
   user: {},
@@ -8,12 +9,13 @@ const CurrentUserContext = createContext({
 export const CurrentUserContextProvider = ({ children }) => {
   //set up user state to store current user info
   const [user, setUser] = useState({
-    id: undefined,
-    username: undefined,
-    firstName: undefined,
-    lastName: undefined,
-    email: undefined,
-    plans: [],
+    id: 'defaultId',
+    username: 'testUsername',
+    firstName: 'test',
+    lastName: 'user',
+    email: 'test@example.com',
+    password: 'testPassword',
+    plans: [...visitingEvents],
     favorite_places: [],
     favorite_events: [],
   });

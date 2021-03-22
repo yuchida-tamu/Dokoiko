@@ -4,7 +4,10 @@ import { visitingEvents } from '../../testData/eventLists';
 import { testEvent } from '../../testData/events';
 import { testPlaceNew } from '../../testData/places';
 import { panelTypes } from './panelTypes';
-
+import { useCurrentUserContext } from '../../contexts/CurrentUserContext';
+import ListModal from '../../components/Modal/ListModal';
+import Backdrop from '../../components/Backdrop/Backdrop';
+import axios from 'axios';
 //visiting events hold id of eventlist
 //favorite events hold id of event
 
@@ -27,13 +30,13 @@ const currentUser = {
 
 const UserDashboard = () => {
   /*Data*/
-  const [user, setUser] = useState(currentUser);
-  const [username, setUsername] = useState(currentUser.username);
-  const [firstName, setFirstName] = useState(currentUser.first_name);
-  const [lastName, setLastName] = useState(currentUser.last_name);
-  const [email, setEmail] = useState(currentUser.email);
-  const [password, setPassword] = useState(currentUser.password);
-  const [visitPlans, setVisitPlans] = useState([]);
+  const { user, setUser } = useCurrentUserContext();
+  const [username, setUsername] = useState(user.username);
+  const [firstName, setFirstName] = useState(user.first_name);
+  const [lastName, setLastName] = useState(user.last_name);
+  const [email, setEmail] = useState(user.email);
+  const [password, setPassword] = useState(user.password);
+  //const [visitPlans, setVisitPlans] = useState(user.plans);
   const [currentPanelShown, setCurrentPanelShown] = useState(
     panelTypes.USER_FORM
   );
@@ -41,12 +44,14 @@ const UserDashboard = () => {
   const [favoriteEvents, setFavoriteEvents] = useState([]);
   const [isVisibleFavPl, setIsVisibleFavPl] = useState(false);
   const [isVisibleFavEvt, setisVisibleFavEvt] = useState(false);
+  const [eventListSelected, setEventListSelected] = useState();
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   /*
     Fetch data onload 
   */
   useEffect(() => {
-    fetchEventLists();
+    fetchEventList();
     fetchFavoriteEvents();
     fetchFavoritePlaces();
   }, []);
@@ -66,6 +71,33 @@ const UserDashboard = () => {
   };
   const onSubmitHandler = event => {
     event.preventDefault();
+
+    //implememt updateUserInfo() to send data to backend
+    const fName = event.target[0].value;
+    const lName = event.target[1].value;
+    const uName = event.target[2].value;
+    const eM = event.target[3].value;
+    const update = {
+      ...user,
+      firstName: fName,
+      lastName: lName,
+      username: uName,
+      email: eM,
+    };
+
+    // axios
+    //   .put(`/api/v1/user/${user.id}`, update)
+    //   .then(response => {
+    //     //retrieve the updated userInfo and set it to the context
+    //     const updatedUser = response.data.user;
+    //     setUser(updatedUser);
+    //   })
+    //   .catch(err => {
+    //     console.error('error: ', err);
+    //   });
+
+    //temporary logic for local dev
+    setUser(update);
   };
   const onOpenUserFormHandler = () => {
     setCurrentPanelShown(panelTypes.USER_FORM);
@@ -74,8 +106,15 @@ const UserDashboard = () => {
   const onOpenPlansHandler = () => {
     //in production, this uses the actual data fetched from api
     //using ids provided by the user(current_user)
-    //const visitingEvents = fetchEventLists(id)
-    setVisitPlans(visitingEvents); //TODO: use useEffect to preload lists instead of fetching data here
+    //const visitingEvents = fetchEventList(id)
+    const plans = user.plans.map(plan => ({ ...plan, isOpen: false }));
+    const updateUser = {
+      ...user,
+      plans: plans,
+    };
+    setUser(updateUser);
+    //setVisitPlans(visitingEvents); //TODO: use useEffect to preload lists instead of fetching data here
+
     setCurrentPanelShown(panelTypes.PLANS);
   };
   const onOpenFavoritesHandler = () => {
@@ -92,8 +131,40 @@ const UserDashboard = () => {
     setisVisibleFavEvt(toggle);
   };
 
-  //TODO: IMPLEMENT fetchEventLists()
-  const fetchEventLists = () => {};
+  const onClickPlanHandler = id => {
+    fetchEventList(id);
+    toggleIsOpen(id);
+    setEventListSelected(id);
+    //TODO: setEventListSelected(fetchEventList(id)); set an object that is fetched from db as the selectedEventlist
+    setIsModalVisible(!isModalVisible);
+  };
+
+  const onClickBackgroundHandler = () => {
+    setIsModalVisible(!isModalVisible);
+  };
+
+  //NOTE: Probably you can refactor this to use it for Favorites List
+  const toggleIsOpen = id => {
+    const target = user.plans.filter(plan => plan._id === id);
+    const update = { ...target[0], isOpen: !target[0].isOpen };
+    const mapped = user.plans.map(plan => {
+      if (plan._id === id) {
+        return update;
+      }
+      return plan;
+    });
+    const updatedPlans = [...mapped];
+
+    const updatedUser = {
+      ...user,
+      plans: updatedPlans,
+    };
+
+    setUser(updatedUser);
+  };
+
+  //TODO: IMPLEMENT fetchEventList()
+  const fetchEventList = id => {};
 
   const fetchFavoritePlaces = () => {
     //Temporary logic for dev purposes
@@ -115,8 +186,14 @@ const UserDashboard = () => {
     setFavoriteEvents(tempArr);
   };
 
-  const renderEventLists = visitPlans.map(list => (
-    <li key={list._id}>
+  const renderEventLists = user.plans.map(list => (
+    <li
+      style={{ cursor: 'pointer' }}
+      key={list._id}
+      onClick={() => {
+        onClickPlanHandler(list._id);
+      }}
+    >
       <h5>{list.name}</h5>
     </li>
   ));
@@ -156,23 +233,23 @@ const UserDashboard = () => {
   const renderFavorites =
     currentPanelShown === panelTypes.FAVORITES ? (
       <Fragment>
-        <ul className="favorite-list">
+        <ul className='favorite-list'>
           <li
-            className="favorite-list__item favorite-list__item__places"
+            className='favorite-list__item favorite-list__item__places'
             onClick={onOpenFavoritePlacesHandler}
           >
             <span>
               Favorite Places
-              <span className="badge">{user.favorite_places.length}</span>
+              <span className='badge'>{user.favorite_places.length}</span>
             </span>
             <div>{renderFavoritePlaces}</div>
           </li>
           <li
-            className="favorite-list__item favorite-list__item__events"
+            className='favorite-list__item favorite-list__item__events'
             onClick={onOpenFavoriteEventsHandler}
           >
             Favorite Events
-            <span className="badge">{user.favorite_events.length}</span>
+            <span className='badge'>{user.favorite_events.length}</span>
             <div>{renderFavoriteEvents}</div>
           </li>
         </ul>
@@ -180,52 +257,52 @@ const UserDashboard = () => {
     ) : null;
 
   return (
-    <div className="user-dashboard__frame indigo lighten-4 container">
-      <ul className="collection user-dashboard__collection">
+    <div className='user-dashboard__frame indigo lighten-4 container'>
+      <Backdrop isVisible={isModalVisible} click={onClickBackgroundHandler} />
+      {isModalVisible ? <ListModal /> : null}
+      <ul className='collection user-dashboard__collection'>
         <li
-          className="collection-item indigo lighten-4 center-align"
+          className='collection-item indigo lighten-4 center-align'
           onClick={onOpenUserFormHandler}
         >
-          <div className="user-dashboard user-dashboard__avator indigo lighten-5"></div>
+          <div className='user-dashboard user-dashboard__avator indigo lighten-5'></div>
         </li>
         <li
-          className="collection-item indigo lighten-4 left-align"
+          className='collection-item indigo lighten-4 left-align'
           onClick={onOpenUserFormHandler}
         >
           {user.username}
         </li>
         <li
-          className="collection-item indigo lighten-4 left-align"
+          className='collection-item indigo lighten-4 left-align'
           onClick={onOpenUserFormHandler}
         >
-          {user.first_name} {user.last_name}
+          {user.firstName} {user.lastName}
         </li>
         <li
-          className="collection-item indigo lighten-4 left-align"
+          className='collection-item indigo lighten-4 left-align'
           onClick={onOpenUserFormHandler}
         >
           {user.email}
         </li>
         <li
-          className="collection-item indigo lighten-4 left-align"
+          className='collection-item indigo lighten-4 left-align'
           onClick={onOpenPlansHandler}
         >
           Plans
-          <span className="badge">
-            {user.visiting_events.length + user.visiting_places.length}
-          </span>
+          <span className='badge'>{user.plans.length}</span>
         </li>
         <li
-          className="collection-item indigo lighten-4 left-align"
+          className='collection-item indigo lighten-4 left-align'
           onClick={onOpenFavoritesHandler}
         >
           Favorites
-          <span className="badge">
+          <span className='badge'>
             {user.favorite_events.length + user.favorite_places.length}
           </span>
         </li>
       </ul>
-      <div className="user-dashboard__detail indigo lighten-5">
+      <div className='user-dashboard__detail indigo lighten-5'>
         {renderUserForm}
         {renderPlans}
         {renderFavorites}
