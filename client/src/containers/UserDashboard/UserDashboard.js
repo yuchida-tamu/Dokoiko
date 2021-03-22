@@ -5,6 +5,8 @@ import { testEvent } from '../../testData/events';
 import { testPlaceNew } from '../../testData/places';
 import { panelTypes } from './panelTypes';
 import { useCurrentUserContext } from '../../contexts/CurrentUserContext';
+import ListModal from '../../components/Modal/ListModal';
+import Backdrop from '../../components/Backdrop/Backdrop';
 import axios from 'axios';
 //visiting events hold id of eventlist
 //favorite events hold id of event
@@ -42,12 +44,14 @@ const UserDashboard = () => {
   const [favoriteEvents, setFavoriteEvents] = useState([]);
   const [isVisibleFavPl, setIsVisibleFavPl] = useState(false);
   const [isVisibleFavEvt, setisVisibleFavEvt] = useState(false);
+  const [eventListSelected, setEventListSelected] = useState();
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   /*
     Fetch data onload 
   */
   useEffect(() => {
-    fetchEventLists();
+    fetchEventList();
     fetchFavoriteEvents();
     fetchFavoritePlaces();
   }, []);
@@ -102,7 +106,7 @@ const UserDashboard = () => {
   const onOpenPlansHandler = () => {
     //in production, this uses the actual data fetched from api
     //using ids provided by the user(current_user)
-    //const visitingEvents = fetchEventLists(id)
+    //const visitingEvents = fetchEventList(id)
     const plans = user.plans.map(plan => ({ ...plan, isOpen: false }));
     const updateUser = {
       ...user,
@@ -128,8 +132,15 @@ const UserDashboard = () => {
   };
 
   const onClickPlanHandler = id => {
-    fetchEventLists(id);
+    fetchEventList(id);
     toggleIsOpen(id);
+    setEventListSelected(id);
+    //TODO: setEventListSelected(fetchEventList(id)); set an object that is fetched from db as the selectedEventlist
+    setIsModalVisible(!isModalVisible);
+  };
+
+  const onClickBackgroundHandler = () => {
+    setIsModalVisible(!isModalVisible);
   };
 
   //NOTE: Probably you can refactor this to use it for Favorites List
@@ -152,8 +163,8 @@ const UserDashboard = () => {
     setUser(updatedUser);
   };
 
-  //TODO: IMPLEMENT fetchEventLists()
-  const fetchEventLists = id => {};
+  //TODO: IMPLEMENT fetchEventList()
+  const fetchEventList = id => {};
 
   const fetchFavoritePlaces = () => {
     //Temporary logic for dev purposes
@@ -184,7 +195,6 @@ const UserDashboard = () => {
       }}
     >
       <h5>{list.name}</h5>
-      {list.isOpen ? 'Opened' : null}
     </li>
   ));
 
@@ -248,6 +258,8 @@ const UserDashboard = () => {
 
   return (
     <div className='user-dashboard__frame indigo lighten-4 container'>
+      <Backdrop isVisible={isModalVisible} click={onClickBackgroundHandler} />
+      {isModalVisible ? <ListModal /> : null}
       <ul className='collection user-dashboard__collection'>
         <li
           className='collection-item indigo lighten-4 center-align'
