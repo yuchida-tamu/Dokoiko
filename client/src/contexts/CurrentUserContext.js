@@ -1,9 +1,15 @@
 import React, { useState, createContext, useContext } from 'react';
 import { visitingEvents } from '../testData/eventLists';
+import { testPlace } from '../testData/places';
+import { testEvent } from '../testData/events';
 
 const CurrentUserContext = createContext({
   user: {},
   setUser: () => {},
+  events: [],
+  setEvents: () => {},
+  places: [],
+  setPlaces: () => {},
 });
 
 export const CurrentUserContextProvider = ({ children }) => {
@@ -19,8 +25,12 @@ export const CurrentUserContextProvider = ({ children }) => {
     favorite_places: [],
     favorite_events: [],
   });
+  const [events, setEvents] = useState([...testEvent]);
+  const [places, setPlaces] = useState([...testPlace]);
   return (
-    <CurrentUserContext.Provider value={{ user, setUser }}>
+    <CurrentUserContext.Provider
+      value={{ user, setUser, events, setEvents, places, setPlaces }}
+    >
       {children}
     </CurrentUserContext.Provider>
   );
