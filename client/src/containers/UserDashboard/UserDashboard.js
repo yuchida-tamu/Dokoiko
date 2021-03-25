@@ -5,32 +5,23 @@ import { testEvent } from '../../testData/events';
 import { testPlaceNew } from '../../testData/places';
 import { panelTypes } from './panelTypes';
 import { useCurrentUserContext } from '../../contexts/CurrentUserContext';
+
 import ListModal from '../../components/Modal/ListModal';
 import Backdrop from '../../components/Backdrop/Backdrop';
 import axios from 'axios';
-//visiting events hold id of eventlist
-//favorite events hold id of event
-
-const currentUser = {
-  username: 'yutaside',
-  first_name: 'Yuta',
-  last_name: 'Uchida',
-  email: 'yuta@example.com',
-  password: '*********',
-  visiting_events: ['dyusayu', 'jisoaijafij', 'jjo2jojojao', 'jiooso12121'],
-  visiting_places: ['dyusa232yu', 'jis33jafij', 'jjo2jo1jojao', 'jioocso12121'],
-  favorite_events: ['dyusayadd4u', , 'jjo2jojo9ijo', 'jill;12121'],
-  favorite_places: [
-    'dyusayu4433',
-    'jisoaijaasdfij',
-    'jjo2joj-00o',
-    'jiohgjo12121',
-  ],
-};
 
 const UserDashboard = () => {
   /*Data*/
-  const { user, setUser } = useCurrentUserContext();
+  //Context
+  const {
+    user,
+    setUser,
+    events,
+    setEvents,
+    places,
+    setPlaces,
+  } = useCurrentUserContext();
+
   const [username, setUsername] = useState(user.username);
   const [firstName, setFirstName] = useState(user.first_name);
   const [lastName, setLastName] = useState(user.last_name);
@@ -44,7 +35,7 @@ const UserDashboard = () => {
   const [favoriteEvents, setFavoriteEvents] = useState([]);
   const [isVisibleFavPl, setIsVisibleFavPl] = useState(false);
   const [isVisibleFavEvt, setisVisibleFavEvt] = useState(false);
-  const [eventListSelected, setEventListSelected] = useState();
+  const [listSelected, setlistSelected] = useState();
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   /*
@@ -134,8 +125,8 @@ const UserDashboard = () => {
   const onClickPlanHandler = id => {
     fetchEventList(id);
     toggleIsOpen(id);
-    setEventListSelected(id);
-    //TODO: setEventListSelected(fetchEventList(id)); set an object that is fetched from db as the selectedEventlist
+    setlistSelected(getListDataById(id));
+    //TODO: setlistSelected(fetchEventList(id)); set an object that is fetched from db as the selectedEventlist
     setIsModalVisible(!isModalVisible);
   };
 
@@ -184,6 +175,26 @@ const UserDashboard = () => {
       tempArr.push(testEvent[i]);
     }
     setFavoriteEvents(tempArr);
+  };
+
+  const getListDataById = id => {
+    const result = user.plans.filter(plan => plan._id === id);
+
+    //TODO:get event objects (plan.events also include places)
+    //loop through the list in the plan obj, which hold ids of event or place
+    const data = result[0].list.map(itemId => {
+      //if the plan contains places fetch data from the place context
+      if (result[0].isPlace) {
+        return places.find(p => p.id === itemId);
+      } else {
+        //if not, fetch data from the event context
+        return events.find(e => e.id === itemId);
+      }
+    });
+
+    const obj = { ...result[0], list: data };
+
+    return obj;
   };
 
   const renderEventLists = user.plans.map(list => (
@@ -259,7 +270,7 @@ const UserDashboard = () => {
   return (
     <div className='user-dashboard__frame indigo lighten-4 container'>
       <Backdrop isVisible={isModalVisible} click={onClickBackgroundHandler} />
-      {isModalVisible ? <ListModal /> : null}
+      {isModalVisible ? <ListModal plan={listSelected} /> : null}
       <ul className='collection user-dashboard__collection'>
         <li
           className='collection-item indigo lighten-4 center-align'

@@ -145,22 +145,20 @@ const PlaceDashboard = () => {
 
   const onAddToExisitingPlanHandler = plan => {
     //chech if the place is already added to the plan
-    if (plan.events.filter(evt => evt === placeSelected.id).length > 0)
+    if (plan.list.filter(evt => evt === placeSelected.id).length > 0)
       return console.log('this place is already added to the plan');
 
     //if not, add it to the plan and update the context
-    console.log('events', plan);
-    const updateEvents = [...plan.events, placeSelected.id];
+
+    const updateEvents = [...plan.list, placeSelected.id];
     const updatePlan = { ...plan, events: updateEvents };
     const filtered = user.plans.filter(plan => plan.name !== updatePlan.name);
     const update = [...filtered, updatePlan];
-    console.log('added to the plan: ', user);
+
     setUser({
       ...user,
       plans: update,
     });
-
-    console.log('type', typeof user.plans);
   };
 
   const expandHandler = () => {
@@ -198,7 +196,7 @@ const PlaceDashboard = () => {
     >
       <span className='plan-item__name'>{plan.name}</span>
       <span className='plan-item__date'>{plan.date}</span>
-      <span className='badge plan-item__count'>{plan.events.length}</span>
+      <span className='badge plan-item__count'>{plan.list.length}</span>
     </li>
   ));
 

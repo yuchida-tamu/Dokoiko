@@ -471,6 +471,17 @@ Auth Form
   padding: 0 4px;
 }
 
+.list-modal ul {
+  width: 100%;
+}
+
+.list-modal__item {
+  width: 100%;
+  padding: 0 16px;
+  cursor: pointer;
+  border-bottom: 1px solid #607d8b impo !important;
+}
+
 /* Backdrop */
 .backdrop_dark {
   position: fixed !important;
