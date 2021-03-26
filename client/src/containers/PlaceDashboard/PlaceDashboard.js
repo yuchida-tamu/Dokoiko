@@ -117,6 +117,7 @@ const PlaceDashboard = () => {
     const date = event.target[1].value;
     if (!planName) {
       window.alert('You need to enter Plan Name');
+      return;
     }
     //prepare data object to send to the api
     const newPlan = {
