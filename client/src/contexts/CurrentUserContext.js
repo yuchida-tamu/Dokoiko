@@ -15,16 +15,20 @@ const CurrentUserContext = createContext({
 export const CurrentUserContextProvider = ({ children }) => {
   //set up user state to store current user info
   const [user, setUser] = useState({
-    id: 'defaultId',
-    username: 'testUsername',
-    firstName: 'test',
-    lastName: 'user',
-    email: 'test@example.com',
-    password: 'testPassword',
-    plans: [...visitingEvents],
-    favorite_places: [],
-    favorite_events: [],
+    isLogged: false,
   });
+  //   {
+  //   id: 'defaultId',
+  //   username: 'testUsername',
+  //   firstName: 'test',
+  //   lastName: 'user',
+  //   email: 'test@example.com',
+  //   password: 'testPassword',
+  //   plans: [...visitingEvents],
+  //   favorite_places: [],
+  //   favorite_events: [],
+  //   isLog
+  // }
   const [events, setEvents] = useState([...testEvent]);
   const [places, setPlaces] = useState([...testPlace]);
   return (
