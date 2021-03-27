@@ -9,21 +9,24 @@ import Backdrop from '../../components/Backdrop/Backdrop';
 
 import { useCurrentUserContext } from '../../contexts/CurrentUserContext';
 
+import { compareByDate } from '../../helpers/helper';
+
 //temporary photo data
 import photo from '../../testData/photos/gallery.jpg';
 const initialPlaces = [...testPlaceNew];
 
 const PlaceDashboard = () => {
   //current_user state
-  const { user, setUser } = useCurrentUserContext();
+  const { user, setUser, places, setPlaces } = useCurrentUserContext();
 
-  const [places, setPlaces] = useState(initialPlaces);
+  //const [places, setPlaces] = useState(initialPlaces);
   const [isExpanded, setIsExpanded] = useState(true);
   const [placeSelected, setPlaceSelected] = useState(places[0]);
   const [isShowModal, setIsShowModal] = useState(false);
 
   //only when the component is rendered for the first time
   useEffect(() => {
+    setUser({ ...user, plans: initSortPlans(user.plans) });
     fetchPlaces();
   }, []);
   //fetch places data and set it to the state
@@ -34,6 +37,11 @@ const PlaceDashboard = () => {
         setPlaces(response.data.places);
       })
       .catch(err => console.log('error: ', err));
+  };
+
+  const initSortPlans = arr => {
+    const result = [...arr];
+    return result.sort(compareByDate);
   };
 
   //when the favorite icon is clicked, add the event to the users favorite list(by adding its place_id)
@@ -62,7 +70,6 @@ const PlaceDashboard = () => {
   const onClickToShowModalHandler = () => {
     const toggle = !isShowModal;
     setIsShowModal(toggle);
-    console.log(isShowModal);
   };
 
   //Should I change the backend api so that the item track isFavoriteed?
@@ -110,13 +117,15 @@ const PlaceDashboard = () => {
     const date = event.target[1].value;
     if (!planName) {
       window.alert('You need to enter Plan Name');
+      return;
     }
     //prepare data object to send to the api
     const newPlan = {
       user_id: user.id,
       name: planName,
       date: date,
-      events: [placeSelected.id],
+      list: [placeSelected.id],
+      isPlace: true,
     };
 
     //send data to the api and save it to db
@@ -134,13 +143,14 @@ const PlaceDashboard = () => {
     //   })
     //   .catch(err => console.log('failed to post new eventlist'));
 
+    const updatedArr = [...user.plans, { ...newPlan }];
+    updatedArr.sort(compareByDate);
+
     //Temp for local test
     setUser({
       ...user,
-      plans: [...user.plans, { ...newPlan, user_id: 'testid123' }],
+      plans: updatedArr,
     });
-
-    console.log('create', user);
   };
 
   const onAddToExisitingPlanHandler = plan => {
@@ -151,10 +161,10 @@ const PlaceDashboard = () => {
     //if not, add it to the plan and update the context
 
     const updateEvents = [...plan.list, placeSelected.id];
-    const updatePlan = { ...plan, events: updateEvents };
+    const updatePlan = { ...plan, list: updateEvents, isPlace: true };
     const filtered = user.plans.filter(plan => plan.name !== updatePlan.name);
     const update = [...filtered, updatePlan];
-
+    update.sort(compareByDate);
     setUser({
       ...user,
       plans: update,

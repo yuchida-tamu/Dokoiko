@@ -31,7 +31,6 @@ const Modal = ({ submit, plans }) => {
             type='date'
             id='start'
             name='plan-start'
-            value='2021-03-19'
             min='2018-01-01'
             max='2999-12-31'
           ></input>
