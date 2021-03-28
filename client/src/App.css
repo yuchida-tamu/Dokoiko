@@ -311,7 +311,7 @@ div.SideControl {
 Auth Form
 */
 
-#auth-card {
+.auth-card {
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
@@ -319,15 +319,20 @@ Auth Form
   width: 512px;
   height: 560px;
   position: absolute;
+  padding: 0 4px;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -59%);
-  background-color: rgba(64, 147, 216, 0.1);
+  transform: translate(-50%, -50%);
+  background-color: rgb(149, 171, 196);
   box-shadow: 0 8px 24px 4px rgb(32, 17, 29);
   border-radius: 8px;
 }
 
-#auth-card__form {
+.auth-card-new {
+  height: 720px !important;
+}
+
+.auth-card__form {
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
@@ -336,19 +341,31 @@ Auth Form
   height: 480px;
 }
 
-#auth-card h2 {
+.auth-card__form label {
+  color: #263238 !important;
+  align-self: self-start;
+  margin: 0 0 4px 8px;
+}
+
+.auth-card h2 {
   display: inline-block;
   color: #263238;
 }
 
-#auth-card__form input {
+.auth-card__form input {
   width: 80%;
   min-width: 312px;
   padding: 0 16px;
   border-radius: 4px;
+  background-color: #b0bec5 !important;
 }
 
-#auth-btn {
+.auth-card__form input::placeholder {
+  color: #263238;
+  opacity: 0.75;
+}
+
+.auth-btn {
   justify-self: last baseline;
 }
 
