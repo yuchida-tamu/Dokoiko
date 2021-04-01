@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useHistory } from 'react-router-dom';
 import { useCurrentUserContext } from '../../contexts/CurrentUserContext';
 import { userReducer } from '../../helpers/helper';
 
 const Auth = () => {
   const { user, setUser } = useCurrentUserContext();
-
+  const history = useHistory();
   //manage Auth state, signin or signup
   const [isSignIn, setIsSignIn] = useState(true);
 
@@ -23,7 +24,7 @@ const Auth = () => {
         const processedUser = userReducer(response.data.user, true);
         console.log('current', processedUser);
         setUser(processedUser);
-        // console.log('current', user);
+        history.push('/user');
       })
       .catch(err => {
         console.error('Failed to login: ', err);

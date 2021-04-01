@@ -6,6 +6,7 @@ import EventDashboard from './containers/EventDashboard/EventDashboard';
 import PlaceDashboard from './containers/PlaceDashboard/PlaceDashboard';
 import UserDashboard from './containers/UserDashboard/UserDashboard';
 import { useCurrentUserContext } from './contexts/CurrentUserContext';
+
 const App = () => {
   const { user } = useCurrentUserContext();
 
