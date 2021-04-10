@@ -21,8 +21,10 @@ const Auth = () => {
     axios
       .post('/auth/login', loginInfo)
       .then(response => {
+        if (!response.data.user._id) return;
         const processedUser = userReducer(response.data.user, true);
         console.log('current', processedUser);
+        sessionStorage.setItem('currentUser', processedUser);
         setUser(processedUser);
         history.push('/user');
       })
@@ -59,11 +61,16 @@ const Auth = () => {
       .post('/api/v1/user/new', newUser)
       .then(response => {
         console.log(response.data);
+        if (response.data.status !== 'SUCCESS') {
+          window.alert("Couldn't sign up successfully. Please try again");
+        }
         const processedUser = userReducer(response.data.user, true);
         setUser(processedUser);
+        history.push('/user');
       })
       .catch(err => {
         console.error('Failed to create a new user: ', err);
+        window.alert("Couldn't sign up successfully. Please try again");
       });
   };
 

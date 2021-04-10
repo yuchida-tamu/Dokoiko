@@ -1,14 +1,30 @@
 import './App.css';
-import React, { useState, createContext } from 'react';
+import React, { useState, createContext, useEffect } from 'react';
 import { Switch, Route, Link } from 'react-router-dom';
 import Auth from './containers/Auth/Auth';
 import EventDashboard from './containers/EventDashboard/EventDashboard';
 import PlaceDashboard from './containers/PlaceDashboard/PlaceDashboard';
 import UserDashboard from './containers/UserDashboard/UserDashboard';
 import { useCurrentUserContext } from './contexts/CurrentUserContext';
+import { userReducer } from './helpers/helper';
+import axios from 'axios';
 
 const App = () => {
-  const { user } = useCurrentUserContext();
+  const { user, setUser } = useCurrentUserContext();
+
+  useEffect(() => {
+    fetchCurrentUser();
+  }, []);
+
+  const fetchCurrentUser = () => {
+    axios.get('/auth/current_user').then(res => {
+      if (res.data) {
+        const processedUser = userReducer(res.data, true);
+        console.log('fetchCurrentUser: ', processedUser);
+        setUser(processedUser);
+      }
+    });
+  };
 
   const routes = user.isLogged ? (
     <Switch>
