@@ -23,8 +23,8 @@ const UserDashboard = () => {
   } = useCurrentUserContext();
 
   const [username, setUsername] = useState(user.username);
-  const [firstName, setFirstName] = useState(user.first_name);
-  const [lastName, setLastName] = useState(user.last_name);
+  const [firstName, setFirstName] = useState(user.firstName);
+  const [lastName, setLastName] = useState(user.lastName);
   const [email, setEmail] = useState(user.email);
   const [password, setPassword] = useState(user.password);
   //const [visitPlans, setVisitPlans] = useState(user.plans);
@@ -220,8 +220,6 @@ const UserDashboard = () => {
         return <li>{place.name}</li>;
       })
     : null;
-
-  const panelSwitchHandler = TYPE => {};
 
   const renderUserForm =
     currentPanelShown === panelTypes.USER_FORM ? (
